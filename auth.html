@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Pakar Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="auth-box" id="login-box">
+            <div class="auth-header">
+                <img src="https://via.placeholder.com/80x80?text=LOGO" alt="Logo" class="auth-logo">
+                <h2>Selamat Datang</h2>
+                <p>Silahkan login untuk diagnosis</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-user">Username</label>
+                    <input type="text" id="login-user" placeholder="Masukkan username" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-pass">Password</label>
+                    <input type="password" id="login-pass" placeholder="Masukkan password" required>
+                </div>
+
+                <div class="auth-buttons">
+                    <button type="button" class="btn-secondary" onclick="switchForm('register')">Register</button>
+                    <button type="submit" class="btn-primary">Login</button>
+                </div>
+            </form>
+
+            <div class="back-link">
+                <a href="index.html">&larr; Kembali ke Beranda</a>
+            </div>
+        </div>
+
+        <div class="auth-box hidden" id="register-box">
+            <div class="auth-header">
+                <h2>Buat Akun Baru</h2>
+                <p>Daftar untuk mulai konsultasi</p>
+            </div>
+
+            <form onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="reg-name" required>
+                </div>
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" id="reg-user" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="reg-pass" required>
+                </div>
+
+                <div class="auth-buttons">
+                    <button type="button" class="btn-secondary" onclick="switchForm('login')">Batal</button>
+                    <button type="submit" class="btn-primary">Daftar Akun</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+
+</html>

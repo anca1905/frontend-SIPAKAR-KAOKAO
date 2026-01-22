@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edukasi & Artikel - SIPAKAR Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span style="color:#2E7D32; font-weight:800;">SIPAKAR</span> KAKAO
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Beranda</a></li>
+                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
+                <li><a href="#" class="active">Edukasi</a></li>
+                <li><a href="index.html#riwayat-area">Riwayat</a></li>
+                <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero small-hero" style="height: 40vh; min-height: 250px;">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <h1>Pusat Edukasi Petani</h1>
+            <p>Informasi terkini dan panduan teknis pengendalian hama & penyakit kakao.</p>
+        </div>
+    </header>
+
+    <section class="section-padding bg-white">
+        <div class="container">
+            <div class="article-list">
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <img src="https://distan.bulelengkab.go.id/uploads/konten/88_mengatasi-busuk-buah-pada-tanaman-kakao.jpg"
+                            alt="Busuk Buah">
+                        <span class="category-badge penyakit">Penyakit</span>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt"></i> 12 Mei 2025</span>
+                            <span><i class="far fa-user"></i> Admin BPP Toari</span>
+                        </div>
+                        <h3><a href="#" onclick="openModal('busuk-buah')">Waspada Penyakit Busuk Buah (Phytophthora) di
+                                Musim Hujan</a></h3>
+                        <p>Penyakit busuk buah kakao merupakan salah satu ancaman terbesar bagi petani. Penyakit ini
+                            disebabkan oleh jamur Phytophthora palmivora yang berkembang pesat saat kelembapan tinggi...
+                        </p>
+                        <a href="#" class="read-more" onclick="openModal('busuk-buah')">Baca Selengkapnya <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <img src="https://gokomodo.com/_next/image?url=https%3A%2F%2Fgkmdblog.s3.ap-southeast-1.amazonaws.com%2Fwp-content%2Fuploads%2F2023%2F10%2F13180428%2FBlog-Hama-Tanaman.jpg&w=1080&q=75"
+                            alt="PBK">
+                        <span class="category-badge hama">Hama</span>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt"></i> 10 Mei 2025</span>
+                            <span><i class="far fa-user"></i> Admin BPP Toari</span>
+                        </div>
+                        <h3><a href="#" onclick="openModal('pbk')">Teknik Sarungisasi untuk Mencegah Hama Penggerek Buah
+                                (PBK)</a></h3>
+                        <p>Hama Penggerek Buah Kakao (PBK) seringkali merusak biji dari dalam. Salah satu metode
+                            pengendalian yang paling efektif dan ramah lingkungan adalah dengan teknik penyelubungan
+                            buah...</p>
+                        <a href="#" class="read-more" onclick="openModal('pbk')">Baca Selengkapnya <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-image">
+                        <img src="https://balittri.litbang.pertanian.go.id/images/kankerbatang.jpg" alt="Kanker Batang">
+                        <span class="category-badge penyakit">Penyakit</span>
+                    </div>
+                    <div class="article-content">
+                        <div class="article-meta">
+                            <span><i class="far fa-calendar-alt"></i> 05 Mei 2025</span>
+                            <span><i class="far fa-user"></i> Pakar Kakao</span>
+                        </div>
+                        <h3><a href="#" onclick="openModal('kanker')">Mengenal Gejala Kanker Batang dan Cara
+                                Pengupasannya</a></h3>
+                        <p>Jika batang kakao Anda mengeluarkan cairan merah seperti karat, waspadalah. Itu adalah tanda
+                            kanker batang yang bisa mematikan pohon jika tidak segera ditangani dengan pengupasan
+                            kulit...</p>
+                        <a href="#" class="read-more" onclick="openModal('kanker')">Baca Selengkapnya <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sistem Pakar Kakao - Kec. Toari</p>
+        </div>
+    </footer>
+
+    <div id="edu-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <div id="modal-body-content">
+            </div>
+        </div>
+    </div>
+
+    <script src="script_landing.js"></script>
+</body>
+
+</html>

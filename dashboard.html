@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - SIPAKAR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+
+    <div class="admin-wrapper">
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf"></i>
+                <span>ADMIN PANEL</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="active" onclick="viewAdmin(this, 'home')">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="viewAdmin(this, 'gejala')">
+                        <i class="fas fa-viruses"></i> Kelola Gejala
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="viewAdmin(this, 'penyakit')">
+                        <i class="fas fa-bacteria"></i> Kelola Penyakit
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="viewAdmin(this, 'laporan')">
+                        <i class="fas fa-file-alt"></i> Laporan Diagnosis
+                    </a>
+                </li>
+                <li class="menu-logout">
+                    <a href="#" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Sistem Pakar Kakao</h2>
+                <div class="user-info">
+                    <span>Admin</span> <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="content-padding">
+
+                <div id="adm-home" class="view-sect">
+                    <h3 class="page-title">Ringkasan Data</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="icon-stat bg-green"><i class="fas fa-notes-medical"></i></div>
+                            <div>
+                                <h3>Total Gejala</h3>
+                                <p class="number" id="total-gejala">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="icon-stat bg-orange"><i class="fas fa-biohazard"></i></div>
+                            <div>
+                                <h3>Total Penyakit</h3>
+                                <p class="number" id="total-penyakit">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="icon-stat bg-blue"><i class="fas fa-users"></i></div>
+                            <div>
+                                <h3>Diagnosis Bulan Ini</h3>
+                                <p class="number">142</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="adm-gejala" class="view-sect hidden">
+                    <div class="row-between mb-3">
+                        <h3 class="page-title">Data Gejala Master</h3>
+                        <button class="btn-primary btn-sm" onclick="openModal('gejala')">
+                            <i class="fas fa-plus"></i> Tambah Gejala
+                        </button>
+                    </div>
+                    <div class="card-table">
+                        <table class="public-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Gejala</th>
+                                    <th width="150">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-gejala-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="adm-penyakit" class="view-sect hidden">
+                    <div class="row-between mb-3">
+                        <h3 class="page-title">Data Penyakit Master</h3>
+                        <button class="btn-primary btn-sm" onclick="openModal('penyakit')">
+                            <i class="fas fa-plus"></i> Tambah Penyakit
+                        </button>
+                    </div>
+                    <div class="card-table">
+                        <table class="public-table">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Nama Penyakit</th>
+                                    <th>Solusi</th>
+                                    <th width="150">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-penyakit-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="adm-laporan" class="view-sect hidden">
+                    <h3 class="page-title">Laporan Diagnosis</h3>
+                    <p>Fitur laporan akan dikembangkan pada tahap selanjutnya.</p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-gejala" class="modal hidden">
+        <div class="modal-content admin-modal">
+            <span class="close-modal" onclick="closeModal('gejala')">&times;</span>
+            <h3 id="modal-title-gejala">Tambah Gejala</h3>
+            <form onsubmit="saveGejala(event)">
+                <input type="hidden" id="gejala-id-lama">
+                <div class="form-group">
+                    <label>Kode Gejala</label>
+                    <input type="text" id="input-kode-gejala" placeholder="Contoh: G01" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama Gejala</label>
+                    <input type="text" id="input-nama-gejala" placeholder="Masukkan nama gejala..." required>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%">Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-penyakit" class="modal hidden">
+        <div class="modal-content admin-modal">
+            <span class="close-modal" onclick="closeModal('penyakit')">&times;</span>
+            <h3 id="modal-title-penyakit">Tambah Penyakit</h3>
+            <form onsubmit="savePenyakit(event)">
+                <input type="hidden" id="penyakit-id-lama">
+                <div class="form-group">
+                    <label>Kode Penyakit</label>
+                    <input type="text" id="input-kode-penyakit" placeholder="Contoh: P01" required>
+                </div>
+                <div class="form-group">
+                    <label>Nama Penyakit</label>
+                    <input type="text" id="input-nama-penyakit" placeholder="Masukkan nama penyakit..." required>
+                </div>
+                <div class="form-group">
+                    <label>Solusi</label>
+                    <textarea id="input-solusi-penyakit" rows="3" placeholder="Masukkan solusi penanganan..."
+                        required></textarea>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%">Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
