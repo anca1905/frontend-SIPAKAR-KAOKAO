@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Relasi Gejala - Penyakit | Sistem CBR Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <style>
+        /* Tambahan kecil yang tidak ada di style.css */
+        .breadcrumb-bar {
+            padding: 10px 30px;
+            font-size: 0.85rem;
+            color: #888;
+            background: #f4f6f8;
+        }
+        .breadcrumb-bar a { color: #888; text-decoration: none; }
+        .breadcrumb-bar a:hover { color: #2E7D32; }
+        .breadcrumb-bar span { color: #333; font-weight: 500; }
+
+        /* Form tambah inline */
+        .form-inline-row {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .form-inline-row .form-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .form-group select:focus {
+            outline: none;
+            border-color: #2E7D32;
+        }
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: #2E7D32;
+        }
+
+        /* Badge bobot */
+        .badge-bobot {
+            display: inline-block;
+            background: #1976D2;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 3px 12px;
+            border-radius: 12px;
+        }
+
+        /* DataTable override agar konsisten */
+        #tbl-relasi_wrapper {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+        }
+        #tbl-relasi_wrapper .dataTables_length select,
+        #tbl-relasi_wrapper .dataTables_filter input {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+        #tbl-relasi_wrapper .dataTables_paginate .paginate_button.current,
+        #tbl-relasi_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: #2E7D32 !important;
+            color: #fff !important;
+            border: none;
+            border-radius: 4px;
+        }
+        #tbl-relasi_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #e8f5e9 !important;
+            color: #2E7D32 !important;
+            border: none;
+            border-radius: 4px;
+        }
+
+        /* Toast notifikasi */
+        .toast-notif {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.875rem;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(16px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .toast-notif.show { opacity: 1; transform: translateY(0); }
+        .toast-notif.success { background: #2E7D32; }
+        .toast-notif.error   { background: #c62828; }
+
+        .btn-sm-action {
+            padding: 5px 12px;
+            font-size: 0.82rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: opacity 0.2s;
+        }
+        .btn-sm-action:hover { opacity: 0.85; }
+        .btn-sm-action.edit   { background: #007bff; }
+        .btn-sm-action.hapus  { background: #dc3545; }
+        .btn-save-inline {
+            padding: 10px 22px;
+            background: #2E7D32;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-save-inline:hover { background: #1B5E20; }
+    </style>
+</head>
+
+<body class="dashboard-body">
+
+    <div class="admin-wrapper">
+
+        <!-- SIDEBAR (identik dengan dashboard.html) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf"></i>
+                <span>ADMIN PANEL</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="kelola_gejala.html"><i class="fas fa-viruses"></i> Kelola Gejala</a></li>
+                <li><a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a></li>
+                <li><a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a></li>
+                <li><a href="kelola_relasi.html" class="active"><i class="fas fa-link"></i> Kelola Relasi<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gejala - Penyakit</a></li>
+                <li><a href="kelola_kasus.html"><i class="fas fa-database"></i> Kelola Data Kasus</a></li>
+                <li><a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a></li>
+                <li><a href="laporan.html"><i class="fas fa-file-alt"></i> Laporan Diagnosis</a></li>
+                <li class="menu-logout"><a href="#" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- KONTEN UTAMA -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Kelola Relasi Gejala - Penyakit</h2>
+                <div class="user-info">
+                    <span id="admin-name">Admin</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="breadcrumb-bar">
+                <a href="dashboard.html">Home</a> /
+                <span>Kelola Relasi Gejala - Penyakit</span>
+            </div>
+
+            <div class="content-padding">
+
+                <!-- TABEL DATA RELASI -->
+                <div class="row-between mb-3">
+                    <h3 class="page-title">Data Relasi Gejala - Penyakit</h3>
+                    <button class="btn-save-inline" onclick="openAddModal()">
+                        <i class="fas fa-plus"></i> Tambah Relasi
+                    </button>
+                </div>
+
+                <div class="card-table mb-3">
+                    <table id="tbl-relasi" class="public-table" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th width="45">No</th>
+                                <th>Gejala</th>
+                                <th>Kode Gejala</th>
+                                <th>Penyakit</th>
+                                <th>Kode Penyakit</th>
+                                <th width="70">Bobot</th>
+                                <th width="150">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl-relasi-body"></tbody>
+                    </table>
+                </div>
+
+
+
+            </div><!-- /content-padding -->
+        </main>
+    </div><!-- /admin-wrapper -->
+
+    <!-- MODAL RELASI (Tambah & Edit) -->
+    <div id="modal-relasi" class="modal hidden">
+        <div class="modal-content admin-modal">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title"><i class="fas fa-link" style="color:#2E7D32; margin-right:8px;"></i>Tambah Relasi</h3>
+
+            <form id="form-relasi" onsubmit="saveRelasi(event)">
+                <input type="hidden" id="relasi-id">
+                <input type="hidden" id="relasi-mode" value="tambah">
+
+                <div class="form-group">
+                    <label>Pilih Gejala</label>
+                    <select id="input-gejala" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-family:'Poppins',sans-serif;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Pilih Penyakit</label>
+                    <select id="input-penyakit" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-family:'Poppins',sans-serif;"></select>
+                </div>
+                <div class="form-group">
+                    <label>Bobot (1–5)</label>
+                    <input type="number" id="input-bobot" min="1" max="5" required
+                        placeholder="Masukkan bobot..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-family:'Poppins',sans-serif;">
+                </div>
+
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="submit" class="btn-save-inline" style="flex:1; justify-content:center;">
+                        <i class="fas fa-save"></i> Simpan Data
+                    </button>
+                    <button type="button" onclick="closeModal()"
+                        style="flex:1; padding:10px; background:#6c757d; color:#fff; border:none; border-radius:6px; cursor:pointer; font-family:'Poppins',sans-serif;">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-notif" id="toast-notif"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script>
+        // ========== AUTH ==========
+        if (!localStorage.getItem('adminToken')) {
+            window.location.href = 'auth.html';
+        }
+        document.getElementById('admin-name').textContent =
+            localStorage.getItem('adminNama') || 'Admin';
+
+        function doLogout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminNama');
+            window.location.href = 'auth.html';
+        }
+
+        function goMenu(el, section) {
+            sessionStorage.setItem('pendingSection', section);
+        }
+
+        // ========== TOAST ==========
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast-notif');
+            t.textContent = msg;
+            t.className = 'toast-notif ' + type + ' show';
+            setTimeout(() => { t.className = 'toast-notif'; }, 3000);
+        }
+
+        // ========== DATA ==========
+        let dtTable = null;
+        let listGejala = [];
+        let listPenyakit = [];
+
+        async function loadDropdowns() {
+            const [rG, rP] = await Promise.all([
+                fetch('api/api_gejala.php?action=read'),
+                fetch('api/api_penyakit.php?action=read')
+            ]);
+            listGejala = await rG.json();
+            listPenyakit = await rP.json();
+
+            const optG = listGejala.map(g =>
+                `<option value="${g.kode}">[${g.kode}] ${g.nama}</option>`
+            ).join('');
+            const optP = listPenyakit.map(p =>
+                `<option value="${p.kode}">[${p.kode}] ${p.nama}</option>`
+            ).join('');
+
+            document.getElementById('input-gejala').innerHTML =
+                '<option value="">-- Pilih Gejala --</option>' + optG;
+            document.getElementById('input-penyakit').innerHTML =
+                '<option value="">-- Pilih Penyakit --</option>' + optP;
+        }
+
+        async function loadRelasi() {
+            const resp = await fetch('api/api_relasi.php?action=read');
+            const data = await resp.json();
+
+            if (dtTable) { dtTable.clear().destroy(); }
+
+            const tbody = document.getElementById('tbl-relasi-body');
+            tbody.innerHTML = '';
+            data.forEach((item, i) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${item.nama_gejala}</td>
+                        <td>${item.kode_gejala}</td>
+                        <td>${item.nama_penyakit}</td>
+                        <td>${item.kode_penyakit}</td>
+                        <td><span class="badge-bobot">${item.bobot}</span></td>
+                        <td>
+                            <button class="btn-sm-action edit"
+                                onclick="openEditModal(${item.id},'${item.kode_gejala}','${item.kode_penyakit}',${item.bobot})">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn-sm-action hapus"
+                                onclick="hapusRelasi(${item.id})">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+
+            dtTable = $('#tbl-relasi').DataTable({
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    paginate: { previous: "Previous", next: "Next" },
+                    zeroRecords: "Tidak ada data yang cocok",
+                    infoEmpty: "Menampilkan 0 data"
+                },
+                columnDefs: [{ orderable: false, targets: [6] }]
+            });
+        }
+
+        // ========== MODAL CONTROL ==========
+        function openAddModal() {
+            document.getElementById('relasi-mode').value = 'tambah';
+            document.getElementById('relasi-id').value = '';
+            document.getElementById('input-gejala').value = '';
+            document.getElementById('input-penyakit').value = '';
+            document.getElementById('input-bobot').value = '';
+            document.getElementById('modal-title').innerHTML = '<i class="fas fa-plus" style="color:#2E7D32; margin-right:8px;"></i>Tambah Relasi Baru';
+            document.getElementById('modal-relasi').classList.remove('hidden');
+        }
+
+        function openEditModal(id, kodeGejala, kodePenyakit, bobot) {
+            document.getElementById('relasi-mode').value = 'edit';
+            document.getElementById('relasi-id').value = id;
+            document.getElementById('input-gejala').value = kodeGejala;
+            document.getElementById('input-penyakit').value = kodePenyakit;
+            document.getElementById('input-bobot').value = bobot;
+            document.getElementById('modal-title').innerHTML = '<i class="fas fa-edit" style="color:#2E7D32; margin-right:8px;"></i>Edit Relasi';
+            document.getElementById('modal-relasi').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-relasi').classList.add('hidden');
+        }
+
+        async function saveRelasi(e) {
+            e.preventDefault();
+            console.log("saveRelasi triggered");
+            
+            const btn = e.submitter || document.querySelector('#form-relasi button[type="submit"]');
+            const originalBtnText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            try {
+                const mode = document.getElementById('relasi-mode').value;
+                const fd = new FormData();
+                
+                if (mode === 'edit') {
+                    fd.append('id', document.getElementById('relasi-id').value);
+                }
+                
+                fd.append('gejala',   document.getElementById('input-gejala').value);
+                fd.append('penyakit', document.getElementById('input-penyakit').value);
+                fd.append('bobot',    document.getElementById('input-bobot').value);
+
+                console.log("Sending data:", Object.fromEntries(fd));
+
+                const resp   = await fetch('api/api_relasi.php?action=save', { method: 'POST', body: fd });
+                const text = await resp.text();
+                console.log("Server response:", text);
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    throw new Error("Respon server tidak valid (bukan JSON): " + text);
+                }
+
+                if (result.status === 'success') {
+                    closeModal();
+                    showToast(result.message, 'success');
+                    loadRelasi();
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error("Save error:", error);
+                showToast("Terjadi kesalahan sistem: " + error.message, 'error');
+            } finally {
+                btn.innerHTML = originalBtnText;
+                btn.disabled = false;
+            }
+        }
+
+        // ========== HAPUS ==========
+        async function hapusRelasi(id) {
+            if (!confirm('Hapus relasi ini? Tindakan tidak dapat dibatalkan.')) return;
+            const fd = new FormData();
+            fd.append('id', id);
+            const resp   = await fetch('api/api_relasi.php?action=delete', { method: 'POST', body: fd });
+            const result = await resp.json();
+            if (result.status === 'success') {
+                showToast('Relasi berhasil dihapus.', 'success');
+                loadRelasi();
+            } else {
+                showToast('Gagal menghapus relasi.', 'error');
+            }
+        }
+
+        // ========== INIT ==========
+        loadDropdowns();
+        loadRelasi();
+    </script>
+
+</body>
+</html>

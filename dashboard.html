@@ -1,188 +1,132 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin - SIPAKAR</title>
+    <title>Dashboard Admin - Sistem CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .stat-link-card {
+            display: flex; align-items: center; gap: 15px;
+            background: white; border-radius: 10px; padding: 18px 22px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            text-decoration: none; color: #333;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border-left: 4px solid transparent;
+        }
+        .stat-link-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+        .stat-link-card .icon { width:48px; height:48px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:#fff; flex-shrink:0; }
+        .stat-link-card h4 { margin:0 0 2px; font-size:0.85rem; color:#888; font-weight:400; }
+        .stat-link-card .num { font-size:1.9rem; font-weight:700; color:#222; line-height:1; }
+        .quick-nav { display:grid; grid-template-columns: repeat(2,1fr); gap:15px; margin-top:25px; }
+        .quick-nav a { display:flex; align-items:center; gap:12px; background:#f4f8f4; border:1px solid #c8e6c9; border-radius:8px; padding:13px 18px; text-decoration:none; color:#2E7D32; font-weight:600; font-size:0.9rem; transition: background 0.2s; }
+        .quick-nav a:hover { background:#e8f5e9; }
+        .quick-nav a i { font-size:1.1rem; }
+        .welcome-card { background: linear-gradient(135deg,#2E7D32,#43A047); border-radius:12px; padding:28px; color:#fff; margin-bottom:25px; }
+        .welcome-card h2 { margin:0 0 5px; font-size:1.4rem; }
+        .welcome-card p { margin:0; opacity:0.85; font-size:0.9rem; }
+    </style>
 </head>
 
 <body class="dashboard-body">
-
     <div class="admin-wrapper">
-
         <aside class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-leaf"></i>
-                <span>ADMIN PANEL</span>
+                <i class="fas fa-leaf"></i><span>ADMIN PANEL</span>
             </div>
             <ul class="sidebar-menu">
-                <li>
-                    <a href="#" class="active" onclick="viewAdmin(this, 'home')">
-                        <i class="fas fa-home"></i> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="viewAdmin(this, 'gejala')">
-                        <i class="fas fa-viruses"></i> Kelola Gejala
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="viewAdmin(this, 'penyakit')">
-                        <i class="fas fa-bacteria"></i> Kelola Penyakit
-                    </a>
-                </li>
-                <li>
-                    <a href="#" onclick="viewAdmin(this, 'laporan')">
-                        <i class="fas fa-file-alt"></i> Laporan Diagnosis
-                    </a>
-                </li>
-                <li class="menu-logout">
-                    <a href="#" onclick="logout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </li>
+                <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="kelola_gejala.html"><i class="fas fa-viruses"></i> Kelola Gejala</a></li>
+                <li><a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a></li>
+                <li><a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a></li>
+                <li><a href="kelola_relasi.html"><i class="fas fa-link"></i> Kelola Relasi<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gejala - Penyakit</a></li>
+                <li><a href="kelola_kasus.html"><i class="fas fa-database"></i> Kelola Data Kasus</a></li>
+                <li><a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a></li>
+                <li><a href="laporan.html"><i class="fas fa-file-alt"></i> Laporan Diagnosis</a></li>
+                <li class="menu-logout"><a href="#" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside>
 
         <main class="main-content">
             <header class="top-bar">
-                <h2>Sistem Pakar Kakao</h2>
-                <div class="user-info">
-                    <span>Admin</span> <i class="fas fa-user-circle"></i>
-                </div>
+                <h2>Sistem CBR Kakao</h2>
+                <div class="user-info"><span id="admin-name">Admin</span> <i class="fas fa-user-circle"></i></div>
             </header>
-
             <div class="content-padding">
 
-                <div id="adm-home" class="view-sect">
-                    <h3 class="page-title">Ringkasan Data</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="icon-stat bg-green"><i class="fas fa-notes-medical"></i></div>
-                            <div>
-                                <h3>Total Gejala</h3>
-                                <p class="number" id="total-gejala">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="icon-stat bg-orange"><i class="fas fa-biohazard"></i></div>
-                            <div>
-                                <h3>Total Penyakit</h3>
-                                <p class="number" id="total-penyakit">0</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="icon-stat bg-blue"><i class="fas fa-users"></i></div>
-                            <div>
-                                <h3>Diagnosis Bulan Ini</h3>
-                                <p class="number">142</p>
-                            </div>
-                        </div>
+                <div class="welcome-card">
+                    <h2>Selamat Datang, <span id="admin-name-greet">Admin</span>! 👋</h2>
+                    <p>Sistem Pakar Case-Based Reasoning (CBR) untuk Diagnosis Hama dan Penyakit Kakao</p>
+                </div>
+
+                <h3 class="page-title">Ringkasan Data</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon-stat bg-green"><i class="fas fa-notes-medical"></i></div>
+                        <div><h3>Total Gejala</h3><p class="number" id="total-gejala">—</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-stat bg-orange"><i class="fas fa-biohazard"></i></div>
+                        <div><h3>Total Penyakit</h3><p class="number" id="total-penyakit">—</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-stat" style="background:#E91E63"><i class="fas fa-bug"></i></div>
+                        <div><h3>Total Hama</h3><p class="number" id="total-hama">—</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-stat" style="background:#9C27B0"><i class="fas fa-database"></i></div>
+                        <div><h3>Total Kasus</h3><p class="number" id="total-kasus">—</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-stat bg-blue"><i class="fas fa-users"></i></div>
+                        <div><h3>Diagnosis Bulan Ini</h3><p class="number" id="total-laporan">—</p></div>
                     </div>
                 </div>
 
-                <div id="adm-gejala" class="view-sect hidden">
-                    <div class="row-between mb-3">
-                        <h3 class="page-title">Data Gejala Master</h3>
-                        <button class="btn-primary btn-sm" onclick="openModal('gejala')">
-                            <i class="fas fa-plus"></i> Tambah Gejala
-                        </button>
-                    </div>
-                    <div class="card-table">
-                        <table class="public-table">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama Gejala</th>
-                                    <th width="150">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-gejala-body">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="adm-penyakit" class="view-sect hidden">
-                    <div class="row-between mb-3">
-                        <h3 class="page-title">Data Penyakit Master</h3>
-                        <button class="btn-primary btn-sm" onclick="openModal('penyakit')">
-                            <i class="fas fa-plus"></i> Tambah Penyakit
-                        </button>
-                    </div>
-                    <div class="card-table">
-                        <table class="public-table">
-                            <thead>
-                                <tr>
-                                    <th>Kode</th>
-                                    <th>Nama Penyakit</th>
-                                    <th>Solusi</th>
-                                    <th width="150">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="table-penyakit-body">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div id="adm-laporan" class="view-sect hidden">
-                    <h3 class="page-title">Laporan Diagnosis</h3>
-                    <p>Fitur laporan akan dikembangkan pada tahap selanjutnya.</p>
+                <h3 class="page-title" style="margin-top:30px;">Navigasi Cepat</h3>
+                <div class="quick-nav">
+                    <a href="kelola_gejala.html"><i class="fas fa-viruses"></i> Kelola Gejala</a>
+                    <a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a>
+                    <a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a>
+                    <a href="kelola_relasi.html"><i class="fas fa-link"></i> Kelola Relasi Gejala - Penyakit</a>
+                    <a href="kelola_kasus.html"><i class="fas fa-database"></i> Kelola Data Kasus</a>
+                    <a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a>
+                    <a href="laporan.html"><i class="fas fa-file-alt"></i> Laporan Diagnosis</a>
+                    <a href="../index.html" target="_blank"><i class="fas fa-globe"></i> Lihat Halaman Publik</a>
                 </div>
 
             </div>
         </main>
     </div>
 
-    <div id="modal-gejala" class="modal hidden">
-        <div class="modal-content admin-modal">
-            <span class="close-modal" onclick="closeModal('gejala')">&times;</span>
-            <h3 id="modal-title-gejala">Tambah Gejala</h3>
-            <form onsubmit="saveGejala(event)">
-                <input type="hidden" id="gejala-id-lama">
-                <div class="form-group">
-                    <label>Kode Gejala</label>
-                    <input type="text" id="input-kode-gejala" placeholder="Contoh: G01" required>
-                </div>
-                <div class="form-group">
-                    <label>Nama Gejala</label>
-                    <input type="text" id="input-nama-gejala" placeholder="Masukkan nama gejala..." required>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%">Simpan Data</button>
-            </form>
-        </div>
-    </div>
+    <script>
+        (function() {
+            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            const nama = localStorage.getItem('adminNama') || 'Admin';
+            document.getElementById('admin-name').innerText = nama;
+            document.getElementById('admin-name-greet').innerText = nama;
+        })();
 
-    <div id="modal-penyakit" class="modal hidden">
-        <div class="modal-content admin-modal">
-            <span class="close-modal" onclick="closeModal('penyakit')">&times;</span>
-            <h3 id="modal-title-penyakit">Tambah Penyakit</h3>
-            <form onsubmit="savePenyakit(event)">
-                <input type="hidden" id="penyakit-id-lama">
-                <div class="form-group">
-                    <label>Kode Penyakit</label>
-                    <input type="text" id="input-kode-penyakit" placeholder="Contoh: P01" required>
-                </div>
-                <div class="form-group">
-                    <label>Nama Penyakit</label>
-                    <input type="text" id="input-nama-penyakit" placeholder="Masukkan nama penyakit..." required>
-                </div>
-                <div class="form-group">
-                    <label>Solusi</label>
-                    <textarea id="input-solusi-penyakit" rows="3" placeholder="Masukkan solusi penanganan..."
-                        required></textarea>
-                </div>
-                <button type="submit" class="btn-primary" style="width:100%">Simpan Data</button>
-            </form>
-        </div>
-    </div>
+        function doLogout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminNama');
+            window.location.href = 'auth.html';
+        }
 
-    <script src="dashboard.js"></script>
+        async function loadStats() {
+            try {
+                const r = await fetch('api/api_dashboard.php');
+                const d = await r.json();
+                document.getElementById('total-gejala').innerText   = d.total_gejala;
+                document.getElementById('total-penyakit').innerText = d.total_penyakit;
+                document.getElementById('total-hama').innerText     = d.total_hama;
+                document.getElementById('total-kasus').innerText    = d.total_kasus;
+                document.getElementById('total-laporan').innerText  = d.total_riwayat_bulan_ini;
+            } catch(e) { console.error(e); }
+        }
+        loadStats();
+    </script>
 </body>
-
 </html>

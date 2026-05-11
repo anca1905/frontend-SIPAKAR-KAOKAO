@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Pakar Kakao - Diagnosis & Riwayat</title>
+    <title>Sistem CBR Kakao - Diagnosis & Riwayat</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -15,15 +15,13 @@
     <nav class="navbar">
         <div class="container nav-container">
             <div class="logo">
-                <span style="color:#2E7D32; font-weight:800;">SIPAKAR</span> KAKAO
+                <span style="color:#2E7D32; font-weight:800;">SISTEM CBR</span> KAKAO
             </div>
             <ul class="nav-links">
-                <li><a href="#hero">Beranda</a></li>
-                <li><a href="#diagnosis-area">Diagnosis</a></li>
-
+                <li><a href="index.html#hero">Beranda</a></li>
+                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
                 <li><a href="edukasi.html">Edukasi</a></li>
-
-                <li><a href="#riwayat-area">Riwayat</a></li>
+                <li><a href="riwayat.html">Riwayat</a></li>
                 <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
             </ul>
         </div>
@@ -42,7 +40,7 @@
         <div class="container">
             <div class="section-title">
                 <h2>Form Diagnosis Mandiri</h2>
-                <p>Silahkan centang gejala yang terlihat pada tanaman kakao Anda.</p>
+                <p>Silahkan centang gejala penyakit/hama yang terlihat pada tanaman kakao Anda.</p>
             </div>
 
             <div class="diagnosis-card">
@@ -51,93 +49,68 @@
                     </div>
 
                     <div class="diagnosis-action">
-                        <div class="input-group-inline">
-                            <input type="text" id="petani-name" placeholder="Nama Petani (Opsional)"
-                                class="input-field">
-                            <input type="text" id="lokasi-kebun" placeholder="Lokasi Kebun (Cth: Desa A)"
-                                class="input-field">
+                        <div class="input-grid-details">
+                            <input type="text" id="petani-name" placeholder="Nama Lengkap" class="input-field" required>
+                            <input type="text" id="lokasi-kebun" placeholder="Alamat / Lokasi Kebun" class="input-field" required>
                         </div>
                         <button type="submit" class="btn-primary btn-block">Cek Kondisi Tanaman</button>
                     </div>
                 </form>
 
-                <div id="diagnosis-result" class="result-box hidden">
-                    <div class="result-header">
-                        <i class="fas fa-notes-medical"></i> Hasil Analisis
+                <div id="diagnosis-result" class="result-card-new hidden">
+                    <div class="result-card-header">
+                        <h2>Hasil Diagnosa</h2>
                     </div>
-                    <div class="result-body">
-                        <h3 id="res-penyakit">Nama Penyakit</h3>
-                        <p>Tingkat Keyakinan: <span id="res-nilai" class="badge">0%</span></p>
-                        <div class="solution-box">
-                            <strong>Solusi:</strong>
-                            <p id="res-solusi">-</p>
+                    <div class="result-card-content">
+                        <div class="result-section">
+                            <h3 class="section-subtitle">Identitas Pemilik :</h3>
+                            <div class="identity-info">
+                                <p>Nama : <span id="res-nama-petani">-</span></p>
+                                <p>Alamat : <span id="res-alamat-petani">-</span></p>
+                            </div>
                         </div>
-                        <button onclick="resetDiagnosis()" class="btn-secondary btn-sm">Tutup / Diagnosis Ulang</button>
+
+                        <div class="result-section">
+                            <h3 class="section-subtitle">Gejala yang diinputkan oleh pemilik :</h3>
+                            <ol class="selected-gejala-list" id="res-gejala-list">
+                                <!-- List gejala akan diisi via JS -->
+                            </ol>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="section-subtitle">Persentase Setiap Penyakit :</h3>
+                            <ul class="disease-percentage-list" id="res-all-percentages">
+                                <!-- List persentase semua penyakit -->
+                            </ul>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="section-subtitle">Hasil Diagnosa :</h3>
+                            <p class="diagnosis-summary" id="res-summary-text">
+                                Dilihat dari hasil persentase setiap penyakit yang tertera, tanaman cokelat anda terjangkit <span id="res-penyakit-name" style="font-weight: bold;">-</span> sebesar <span id="res-penyakit-percent" style="font-weight: bold;">0%</span>
+                            </p>
+                        </div>
+
+                        <div class="result-section">
+                            <h3 class="section-subtitle">Solusi Pengobatan :</h3>
+                            <div class="solution-content" id="res-solusi-list">
+                                <!-- List solusi -->
+                            </div>
+                        </div>
+
+                        <div class="result-footer-actions">
+                            <button onclick="window.print()" class="btn-print"><i class="fas fa-print"></i> Cetak Hasil</button>
+                            <button onclick="resetDiagnosis()" class="btn-secondary">Diagnosis Ulang</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="riwayat-area" class="section-padding bg-light">
-        <div class="container">
-            <div class="section-title">
-                <h2>Data Sebaran & Riwayat Diagnosis</h2>
-                <p>Lihat hasil diagnosis petani lain di Kecamatan Toari.</p>
-            </div>
-
-            <div class="filter-box">
-                <div class="filter-header">
-                    <i class="fas fa-filter"></i> Filter Data
-                </div>
-                <div class="filter-inputs">
-                    <div class="f-group">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" id="filter-start">
-                    </div>
-                    <div class="f-group">
-                        <label>Tanggal Akhir</label>
-                        <input type="date" id="filter-end">
-                    </div>
-                    <div class="f-group">
-                        <label>Penyakit</label>
-                        <select id="filter-penyakit">
-                            <option value="all">Semua Penyakit</option>
-                            <option value="Busuk Buah">Busuk Buah</option>
-                            <option value="Jamur Upas">Jamur Upas</option>
-                            <option value="Kanker Batang">Kanker Batang</option>
-                            <option value="Penggerek Buah">Penggerek Buah</option>
-                        </select>
-                    </div>
-                    <div class="f-group btn-area">
-                        <button onclick="applyFilter()" class="btn-filter">Terapkan</button>
-                        <button onclick="resetFilter()" class="btn-reset">Reset</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <table class="public-table">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Nama Petani</th>
-                            <th>Lokasi</th>
-                            <th>Hasil Diagnosis</th>
-                            <th>Nilai Kepastian</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-body">
-                    </tbody>
-                </table>
-                <p id="no-data-msg" class="hidden text-center">Data tidak ditemukan.</p>
             </div>
         </div>
     </section>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Sistem Pakar Kakao - Kec. Toari</p>
+            <p>&copy; 2025 Sistem CBR Kakao - Kec. Toari</p>
         </div>
     </footer>
 

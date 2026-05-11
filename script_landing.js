@@ -1,91 +1,147 @@
-// --- DATA DUMMY GEJALA ---
-const gejalaList = [
-    { id: 'G01', name: 'Bercak hitam pada buah' },
-    { id: 'G02', name: 'Buah busuk basah' },
-    { id: 'G03', name: 'Daun menguning' },
-    { id: 'G04', name: 'Bercak putih seperti tepung' },
-    { id: 'G05', name: 'Kanker pada batang' }
-];
-
-// --- DATA DUMMY RIWAYAT (Untuk simulasi database) ---
-let riwayatData = [
-    { id: 1, tanggal: '2025-05-20', nama: 'Pak Budi', lokasi: 'Desa Lamekongga', penyakit: 'Busuk Buah', nilai: '85%' },
-    { id: 2, tanggal: '2025-05-21', nama: 'Ibu Susi', lokasi: 'Desa Toari', penyakit: 'Jamur Upas', nilai: '70%' },
-    { id: 3, tanggal: '2025-05-22', nama: 'Pak Anto', lokasi: 'Desa Wonua', penyakit: 'Penggerek Buah', nilai: '92%' },
-    { id: 4, tanggal: '2025-06-01', nama: 'Anonim', lokasi: 'Desa Lamekongga', penyakit: 'Busuk Buah', nilai: '88%' },
-    { id: 5, tanggal: '2025-06-02', nama: 'Pak Rahmat', lokasi: 'Desa Toari', penyakit: 'Kanker Batang', nilai: '65%' },
-];
-
+// --- SAAT HALAMAN DIMUAT ---
+let riwayatData = [];
 document.addEventListener("DOMContentLoaded", () => {
-    loadGejalaPublic();
-    renderHistoryTable(riwayatData); // Load semua data awal
-
-    // Set default date hari ini di filter
-    // document.getElementById('filter-end').valueAsDate = new Date();
+    loadGejalaPublic(); // Ambil gejala dari database
+    loadRiwayatPublic(); // Ambil tabel riwayat dari database
 });
 
-// 1. FUNGSI LOAD GEJALA KE FORM
-function loadGejalaPublic() {
+// 1. LOAD GEJALA DARI DATABASE (Via API Gejala)
+async function loadGejalaPublic() {
     const container = document.getElementById('public-gejala-list');
-    gejalaList.forEach(g => {
-        container.innerHTML += `
-            <div class="gejala-item">
-                <input type="checkbox" id="${g.id}" value="${g.id}">
-                <label for="${g.id}">${g.name}</label>
-            </div>
-        `;
-    });
+    container.innerHTML = '<p>Memuat data gejala...</p>';
+
+    try {
+        // Kita pakai api_gejala.php yang sudah dibuat sebelumnya
+        const response = await fetch('api/api_gejala.php?action=read');
+        const data = await response.json();
+
+        container.innerHTML = '';
+        data.forEach(g => {
+            container.innerHTML += `
+                <div class="gejala-item">
+                    <input type="checkbox" id="${g.kode}" name="gejala_check" value="${g.kode}">
+                    <label for="${g.kode}">[${g.kode}] ${g.nama}</label>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error(error);
+        container.innerHTML = '<p style="color:red">Gagal memuat gejala.</p>';
+    }
 }
 
-// 2. FUNGSI DIAGNOSIS (SIMULASI)
-function handlePublicDiagnosis(e) {
+// 2. LOAD RIWAYAT UNTUK TABEL PUBLIC
+async function loadRiwayatPublic() {
+    try {
+        const response = await fetch('api/api_riwayat.php');
+        riwayatData = await response.json();
+        renderHistoryTable(riwayatData);
+    } catch (err) {
+        console.error("Riwayat fetch error:", err);
+    }
+}
+
+// 3. PROSES DIAGNOSIS (Kirim ke api_diagnosis.php)
+async function handlePublicDiagnosis(e) {
     e.preventDefault();
-    const checked = document.querySelectorAll('#public-gejala-list input:checked');
-    if (checked.length === 0) { alert("Pilih minimal satu gejala!"); return; }
+
+    // Ambil semua checkbox yang dicentang
+    const checkboxes = document.querySelectorAll('input[name="gejala_check"]:checked');
+    let selectedGejala = [];
+    let selectedGejalaNames = [];
+
+    checkboxes.forEach((cb) => {
+        selectedGejala.push(cb.value); x
+        // Ambil teks label (biasanya di samping checkbox)
+        const label = document.querySelector(`label[for="${cb.id}"]`).innerText;
+        selectedGejalaNames.push(label);
+    });
+
+    if (selectedGejala.length === 0) {
+        alert("Pilih minimal satu gejala!");
+        return;
+    }
 
     const nama = document.getElementById('petani-name').value || "Petani Umum";
     const lokasi = document.getElementById('lokasi-kebun').value || "-";
+    const btn = document.querySelector('.btn-block');
 
-    // Simulasi Loading
-    document.querySelector('.btn-block').innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis...';
+    // UI Loading
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Menganalisis...';
+    btn.disabled = true;
 
-    setTimeout(() => {
-        // Simulasi Hasil (Hardcode dulu untuk UI)
-        const hasilPenyakit = "Busuk Buah";
-        const nilai = "88%";
-        const solusi = "Lakukan sanitasi kebun, kubur buah yang busuk, dan kurangi kelembapan dengan pemangkasan.";
+    try {
+        // KIRIM DATA KE BACKEND
+        const response = await fetch('api/api_diagnosis.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                gejala: selectedGejala,
+                nama: nama,
+                lokasi: lokasi
+            })
+        });
 
-        // Tampilkan Hasil
-        document.getElementById('res-penyakit').innerText = hasilPenyakit;
-        document.getElementById('res-nilai').innerText = nilai;
-        document.getElementById('res-solusi').innerText = solusi;
-        document.getElementById('diagnosis-result').classList.remove('hidden');
-        document.querySelector('.btn-block').innerText = 'Cek Kondisi Tanaman';
+        const result = await response.json();
 
-        // Simpan ke Data Dummy (Biar langsung muncul di tabel bawah)
-        const newData = {
-            id: riwayatData.length + 1,
-            tanggal: new Date().toISOString().split('T')[0],
-            nama: nama,
-            lokasi: lokasi,
-            penyakit: hasilPenyakit,
-            nilai: nilai
-        };
-        riwayatData.unshift(newData); // Tambah ke paling atas
-        renderHistoryTable(riwayatData); // Refresh tabel
+        if (result.status === 'success') {
+            if (result.hasil === null || !result.penyakit) {
+                alert(result.message || "Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.");
+            } else {
+                // POPULASI DATA KE UI BARU
 
-        // Scroll ke hasil
-        document.getElementById('diagnosis-result').scrollIntoView({ behavior: 'smooth' });
+                // 1. Identitas
+                document.getElementById('res-nama-petani').innerText = nama;
+                document.getElementById('res-alamat-petani').innerText = lokasi;
 
-    }, 1500);
+                // 2. Daftar Gejala yang dipilih
+                const gejalaListUI = document.getElementById('res-gejala-list');
+                gejalaListUI.innerHTML = '';
+                selectedGejalaNames.forEach(gName => {
+                    gejalaListUI.innerHTML += `<li>${gName}</li>`;
+                });
+
+                // 3. Persentase Semua Penyakit
+                const percentListUI = document.getElementById('res-all-percentages');
+                percentListUI.innerHTML = '';
+                if (result.detail_perhitungan) {
+                    result.detail_perhitungan.forEach(dp => {
+                        percentListUI.innerHTML += `<li>Persentase Tanaman Kakao Terserang ${dp.nama} Sebesar ${dp.persen}%</li>`;
+                    });
+                }
+
+                // 4. Ringkasan Hasil
+                document.getElementById('res-penyakit-name').innerText = result.penyakit;
+                document.getElementById('res-penyakit-percent').innerText = result.nilai + "%";
+
+                // 5. Solusi
+                document.getElementById('res-solusi-list').innerHTML = result.solusi;
+
+                // Munculkan Kotak Hasil
+                document.getElementById('diagnosis-result').classList.remove('hidden');
+                document.getElementById('diagnosis-result').scrollIntoView({ behavior: 'smooth' });
+
+                loadRiwayatPublic();
+            }
+        } else {
+            alert("Terjadi kesalahan: " + result.message);
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert("Gagal menghubungi server.");
+    } finally {
+        btn.innerText = 'Cek Kondisi Tanaman';
+        btn.disabled = false;
+    }
 }
-
 function resetDiagnosis() {
     document.getElementById('public-diagnosis-form').reset();
     document.getElementById('diagnosis-result').classList.add('hidden');
 }
 
-// 3. FUNGSI RENDER TABEL & FILTER
+// ... (Fungsi renderHistoryTable dan filter tetap sama, tinggal sesuaikan datanya nanti) ...
+
 function renderHistoryTable(data) {
     const tbody = document.getElementById('history-body');
     const noData = document.getElementById('no-data-msg');
@@ -98,14 +154,15 @@ function renderHistoryTable(data) {
         noData.classList.add('hidden');
     }
 
-    data.forEach(item => {
+    data.forEach((item, index) => {
         tbody.innerHTML += `
             <tr>
-                <td>${item.tanggal}</td>
+                <td>${index + 1}</td>
+                <td>${item.tgl}</td>
                 <td>${item.nama}</td>
                 <td>${item.lokasi}</td>
-                <td><span style="color:#2E7D32; font-weight:bold;">${item.penyakit}</span></td>
-                <td>${item.nilai}</td>
+                <td><span style="color:#2E7D32; font-weight:bold;">${item.hasil}</span></td>
+                <td><span class="badge" style="background:#17a2b8; color:#fff">${item.nilai}</span></td>
             </tr>
         `;
     });
@@ -116,17 +173,14 @@ function applyFilter() {
     const endDate = document.getElementById('filter-end').value;
     const penyakit = document.getElementById('filter-penyakit').value;
 
-    // Filter Logic Array Javascript
     let filteredData = riwayatData.filter(item => {
         let validDate = true;
         let validPenyakit = true;
 
-        // Cek Tanggal
-        if (startDate && item.tanggal < startDate) validDate = false;
-        if (endDate && item.tanggal > endDate) validDate = false;
+        if (startDate && item.tgl < startDate) validDate = false;
+        if (endDate && item.tgl > endDate) validDate = false;
 
-        // Cek Penyakit
-        if (penyakit !== 'all' && item.penyakit !== penyakit) validPenyakit = false;
+        if (penyakit !== 'all' && item.hasil !== penyakit) validPenyakit = false;
 
         return validDate && validPenyakit;
     });
@@ -145,7 +199,6 @@ function scrollToDiagnosis() {
     document.getElementById('diagnosis-area').scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- DATA EDUKASI (SIMULASI DATABASE) ---
 const eduData = {
     'busuk-buah': {
         title: 'Busuk Buah (Phytophthora)',
@@ -167,7 +220,6 @@ const eduData = {
     }
 };
 
-// FUNGSI MODAL
 function openModal(id) {
     const data = eduData[id];
     if (!data) return;
@@ -190,7 +242,6 @@ function closeModal() {
     document.getElementById('edu-modal').classList.add('hidden');
 }
 
-// Tutup modal kalau klik di luar kotak
 window.onclick = function (event) {
     const modal = document.getElementById('edu-modal');
     if (event.target == modal) {

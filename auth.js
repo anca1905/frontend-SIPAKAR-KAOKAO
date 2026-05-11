@@ -1,4 +1,3 @@
-// Fungsi Pindah Form (Login <-> Register)
 function switchForm(target) {
     const loginBox = document.getElementById('login-box');
     const registerBox = document.getElementById('register-box');
@@ -12,34 +11,64 @@ function switchForm(target) {
     }
 }
 
-// Fungsi Login (Simulasi)
-function handleLogin(e) {
-    e.preventDefault(); // Mencegah reload halaman
+async function handleLogin(e) {
+    e.preventDefault();
 
     const user = document.getElementById('login-user').value;
     const pass = document.getElementById('login-pass').value;
 
     if (user && pass) {
-        // Simpan username di LocalStorage biar bisa dipanggil di Dashboard nanti
-        localStorage.setItem('username', user);
+        const formData = new FormData();
+        formData.append('username', user);
+        formData.append('password', pass);
 
-        alert(`Login Berhasil! Selamat datang, ${user}`);
+        try {
+            const resp = await fetch('api/api_auth.php?action=login', {method: 'POST', body: formData});
+            const result = await resp.json();
 
-        // Redirect ke Dashboard (Langkah 3 nanti)
-        window.location.href = 'dashboard.html'; 
-        // alert("Selanjutnya kita akan diarahkan ke Dashboard.html (Langkah Berikutnya)");
+            if(result.status === 'success') {
+                localStorage.setItem('adminToken', result.token);
+                localStorage.setItem('adminNama', result.nama);
+                alert(`Login Berhasil! Selamat datang, ${result.nama}`);
+                window.location.href = 'dashboard.html';
+            } else {
+                alert(result.message);
+            }
+        } catch(err) {
+            alert('Gagal menghubungi server');
+        }
     } else {
         alert("Mohon isi username dan password!");
     }
 }
 
-// Fungsi Register (Simulasi)
-function handleRegister(e) {
+async function handleRegister(e) {
     e.preventDefault();
     const name = document.getElementById('reg-name').value;
+    const user = document.getElementById('reg-user').value;
+    const pass = document.getElementById('reg-pass').value;
 
-    if (name) {
-        alert("Pendaftaran Berhasil! Silahkan Login.");
-        switchForm('login'); // Balikin ke form login
+    if (name && user && pass) {
+        const formData = new FormData();
+        formData.append('nama', name);
+        formData.append('username', user);
+        formData.append('password', pass);
+
+        try {
+            const resp = await fetch('api/api_auth.php?action=register', {method: 'POST', body: formData});
+            const result = await resp.json();
+
+            if(result.status === 'success') {
+                alert("Pendaftaran Berhasil! Silahkan Login.");
+                document.getElementById('reg-name').value = '';
+                document.getElementById('reg-user').value = '';
+                document.getElementById('reg-pass').value = '';
+                switchForm('login');
+            } else {
+                alert(result.message);
+            }
+        } catch(err) {
+            alert('Gagal mendaftar, periksa koneksi');
+        }
     }
 }

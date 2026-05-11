@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Diagnosis - Sistem CBR Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <span style="color:#2E7D32; font-weight:800;">SISTEM CBR</span> KAKAO
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#hero">Beranda</a></li>
+                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
+                <li><a href="edukasi.html">Edukasi</a></li>
+                <li><a href="riwayat.html">Riwayat</a></li>
+                <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="hero small-hero" style="min-height: 250px; height: 35vh;">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <h1>Data Sebaran & Riwayat</h1>
+            <p>Lihat hasil diagnosis petani lain di Kecamatan Toari.</p>
+        </div>
+    </header>
+
+    <section id="riwayat-area" class="section-padding bg-light" style="padding-top: 50px;">
+        <div class="container">
+            <div class="filter-box">
+                <div class="filter-header">
+                    <i class="fas fa-filter"></i> Filter Data
+                </div>
+                <div class="filter-inputs">
+                    <div class="f-group">
+                        <label>Tanggal Mulai</label>
+                        <input type="date" id="filter-start">
+                    </div>
+                    <div class="f-group">
+                        <label>Tanggal Akhir</label>
+                        <input type="date" id="filter-end">
+                    </div>
+                    <div class="f-group">
+                        <label>Penyakit</label>
+                        <select id="filter-penyakit">
+                            <option value="all">Semua Penyakit</option>
+                            <option value="Busuk Buah">Busuk Buah</option>
+                            <option value="Jamur Upas">Jamur Upas</option>
+                            <option value="Kanker Batang">Kanker Batang</option>
+                            <option value="Penggerek Buah">Penggerek Buah</option>
+                        </select>
+                    </div>
+                    <div class="f-group btn-area">
+                        <button onclick="applyFilter()" class="btn-filter">Terapkan</button>
+                        <button onclick="resetFilter()" class="btn-reset">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="public-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nama Petani</th>
+                            <th>Lokasi</th>
+                            <th>Hasil Diagnosis</th>
+                            <th>Tingkat Kemiripan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                    </tbody>
+                </table>
+                <p id="no-data-msg" class="hidden text-center">Data tidak ditemukan.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Sistem CBR Kakao - Kec. Toari</p>
+        </div>
+    </footer>
+
+    <script src="script_landing.js"></script>
+</body>
+
+</html>

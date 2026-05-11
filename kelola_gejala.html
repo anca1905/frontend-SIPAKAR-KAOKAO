@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Gejala - Admin CBR Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="admin-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf"></i><span>ADMIN PANEL</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="kelola_gejala.html" class="active"><i class="fas fa-viruses"></i> Kelola Gejala</a></li>
+                <li><a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a></li>
+                <li><a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a></li>
+                <li><a href="kelola_relasi.html"><i class="fas fa-link"></i> Kelola Relasi<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gejala - Penyakit</a></li>
+                <li><a href="kelola_kasus.html"><i class="fas fa-database"></i> Kelola Data Kasus</a></li>
+                <li><a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a></li>
+                <li><a href="laporan.html"><i class="fas fa-file-alt"></i> Laporan Diagnosis</a></li>
+                <li class="menu-logout"><a href="#" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Kelola Gejala</h2>
+                <div class="user-info"><span id="admin-name">Admin</span> <i class="fas fa-user-circle"></i></div>
+            </header>
+            <div class="content-padding">
+                <div class="row-between mb-3">
+                    <h3 class="page-title">Data Gejala Master</h3>
+                    <button class="btn-primary btn-sm" onclick="openModalGejala()">
+                        <i class="fas fa-plus"></i> Tambah Gejala
+                    </button>
+                </div>
+                <div class="card-table">
+                    <table class="public-table">
+                        <thead>
+                            <tr>
+                                <th width="50">No</th>
+                                <th width="110">Kode</th>
+                                <th>Nama Gejala</th>
+                                <th width="130">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-gejala-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Gejala -->
+    <div id="modal-gejala" class="modal hidden">
+        <div class="modal-content admin-modal">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title-gejala">Tambah Gejala</h3>
+            <form onsubmit="saveGejala(event)">
+                <input type="hidden" id="gejala-mode">
+                <div class="form-group">
+                    <label>Kode Gejala (Otomatis)</label>
+                    <input type="text" id="input-kode-gejala" style="background:#e9ecef; cursor:not-allowed;" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Nama Gejala</label>
+                    <input type="text" id="input-nama-gejala" placeholder="Masukkan nama gejala..." required>
+                </div>
+                <button type="submit" class="btn-primary" style="width:100%"><i class="fas fa-save"></i> Simpan Data</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
+        })();
+
+        function doLogout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminNama');
+            window.location.href = 'auth.html';
+        }
+
+        let dataGejala = [];
+
+        async function loadGejala() {
+            const resp = await fetch('api/api_gejala.php?action=read');
+            dataGejala = await resp.json();
+            const tbody = document.getElementById('table-gejala-body');
+            tbody.innerHTML = '';
+            if (dataGejala.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888;padding:20px;">Belum ada data gejala</td></tr>';
+                return;
+            }
+            dataGejala.forEach((item, i) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><b>${item.kode}</b></td>
+                        <td>${item.nama}</td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="editGejala(${i})" style="padding:5px 10px; background:#007bff;"><i class="fas fa-edit"></i></button>
+                            <button class="btn-primary btn-sm" onclick="hapusGejala('${item.kode}')" style="padding:5px 10px; background:#dc3545;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function generateKode() {
+            if (dataGejala.length === 0) return 'G01';
+            const last = dataGejala[dataGejala.length - 1].kode;
+            const num = parseInt(last.replace(/\D/g, '')) + 1;
+            return 'G' + String(num).padStart(2, '0');
+        }
+
+        function openModalGejala() {
+            document.getElementById('gejala-mode').value = 'tambah';
+            document.getElementById('input-kode-gejala').value = generateKode();
+            document.getElementById('input-nama-gejala').value = '';
+            document.getElementById('modal-title-gejala').innerText = 'Tambah Gejala Baru';
+            document.getElementById('modal-gejala').classList.remove('hidden');
+        }
+
+        function editGejala(index) {
+            document.getElementById('gejala-mode').value = 'edit';
+            document.getElementById('input-kode-gejala').value = dataGejala[index].kode;
+            document.getElementById('input-nama-gejala').value = dataGejala[index].nama;
+            document.getElementById('modal-title-gejala').innerText = 'Edit Gejala';
+            document.getElementById('modal-gejala').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-gejala').classList.add('hidden');
+        }
+
+        async function saveGejala(e) {
+            e.preventDefault();
+            const mode = document.getElementById('gejala-mode').value;
+            const fd = new FormData();
+            fd.append('kode', document.getElementById('input-kode-gejala').value);
+            fd.append('nama', document.getElementById('input-nama-gejala').value);
+            fd.append('mode', mode);
+            const resp = await fetch('api/api_gejala.php?action=save', { method: 'POST', body: fd });
+            const res  = await resp.json();
+            if (res.status === 'success') { closeModal(); loadGejala(); showToast(res.message, 'success'); }
+            else showToast(res.message, 'error');
+        }
+
+        async function hapusGejala(kode) {
+            if (!confirm('Hapus gejala ' + kode + '?')) return;
+            const fd = new FormData();
+            fd.append('kode', kode);
+            await fetch('api/api_gejala.php?action=delete', { method: 'POST', body: fd });
+            loadGejala();
+            showToast('Gejala berhasil dihapus', 'success');
+        }
+
+        function showToast(msg, type = 'success') {
+            let t = document.getElementById('toast-notif');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast-notif';
+                t.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 22px;border-radius:8px;color:#fff;font-family:Poppins,sans-serif;font-size:0.875rem;z-index:9999;opacity:0;transform:translateY(16px);transition:all 0.3s;pointer-events:none;';
+                document.body.appendChild(t);
+            }
+            t.innerText = msg;
+            t.style.background = type === 'success' ? '#2E7D32' : '#c62828';
+            t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(16px)'; }, 3000);
+        }
+
+        loadGejala();
+    </script>
+</body>
+</html>

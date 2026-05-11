@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Data Kasus - Admin CBR Kakao</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .badge-gejala {
+            display: inline-block; background: #1565C0; color: #fff;
+            font-size: 0.72rem; font-weight: 600; padding: 2px 8px;
+            border-radius: 4px; margin: 2px; letter-spacing: 0.3px;
+        }
+        .badge-jml {
+            display: inline-block; background: #2E7D32; color: #fff;
+            font-size: 0.78rem; font-weight: 600; padding: 3px 12px; border-radius: 12px;
+        }
+        .form-row { display:flex; gap:15px; }
+        .form-row .form-group { flex:1; }
+        .checkbox-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 6px 20px; background:#f4f6f8; padding:15px;
+            border-radius:8px; max-height:260px; overflow-y:auto; border:1px solid #ddd;
+        }
+        .chk-item { display:flex; align-items:center; gap:6px; padding:3px 0; }
+        .chk-item input { margin:0; width:16px; height:16px; cursor:pointer; accent-color:#2E7D32; }
+        .chk-item label { margin:0; font-size:0.82rem; cursor:pointer; font-weight:normal; }
+    </style>
+</head>
+
+<body class="dashboard-body">
+    <div class="admin-wrapper">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf"></i><span>ADMIN PANEL</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="kelola_gejala.html"><i class="fas fa-viruses"></i> Kelola Gejala</a></li>
+                <li><a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a></li>
+                <li><a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a></li>
+                <li><a href="kelola_relasi.html"><i class="fas fa-link"></i> Kelola Relasi<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gejala - Penyakit</a></li>
+                <li><a href="kelola_kasus.html" class="active"><i class="fas fa-database"></i> Kelola Data Kasus</a></li>
+                <li><a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a></li>
+                <li><a href="laporan.html"><i class="fas fa-file-alt"></i> Laporan Diagnosis</a></li>
+                <li class="menu-logout"><a href="#" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <h2>Kelola Data Kasus</h2>
+                <div class="user-info"><span id="admin-name">Admin</span> <i class="fas fa-user-circle"></i></div>
+            </header>
+            <div class="content-padding">
+                <div class="row-between mb-3">
+                    <h3 class="page-title">Data Kasus (Case Base)</h3>
+                    <button class="btn-primary btn-sm" onclick="openModalKasus()">
+                        <i class="fas fa-plus"></i> Tambah Kasus
+                    </button>
+                </div>
+                <div class="card-table">
+                    <table class="public-table">
+                        <thead>
+                            <tr>
+                                <th width="45">No</th>
+                                <th width="110">Kode Kasus</th>
+                                <th>Nama Kasus</th>
+                                <th>Jenis Penyakit</th>
+                                <th>Gejala yang Muncul</th>
+                                <th width="80">Jumlah</th>
+                                <th width="110">Tgl Input</th>
+                                <th width="100">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-kasus-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Kasus -->
+    <div id="modal-kasus" class="modal hidden">
+        <div class="modal-content admin-modal" style="max-width:800px;">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modal-title-kasus">Tambah Data Kasus</h3>
+            <form onsubmit="saveKasus(event)">
+                <input type="hidden" id="kasus-mode">
+                <div class="form-row">
+                    <div class="form-group" style="flex:1;">
+                        <label>Kode Kasus</label>
+                        <input type="text" id="input-kasus-kode" placeholder="Contoh: K001" required>
+                    </div>
+                    <div class="form-group" style="flex:2.5;">
+                        <label>Nama Kasus</label>
+                        <input type="text" id="input-kasus-nama" placeholder="Contoh: Kasus Busuk Buah 1" required>
+                    </div>
+                    <div class="form-group" style="flex:2.5;">
+                        <label>Jenis Penyakit / Hama</label>
+                        <select id="input-kasus-penyakit" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-family:'Poppins',sans-serif; font-size:0.9rem;" required></select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Pilih Gejala yang Muncul <small style="color:#888;">(centang semua gejala yang relevan)</small></label>
+                    <div id="checkbox-gejala-container" class="checkbox-grid"></div>
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+                    <button type="button" class="btn-primary btn-sm" onclick="closeModal()" style="background:#6c757d;">Batal</button>
+                    <button type="submit" class="btn-primary btn-sm"><i class="fas fa-save"></i> Simpan Kasus</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
+        })();
+
+        function doLogout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminNama');
+            window.location.href = 'auth.html';
+        }
+
+        let dataKasus = [];
+
+        async function loadKasus() {
+            const resp = await fetch('api/api_kasus.php?action=read');
+            dataKasus = await resp.json();
+            const tbody = document.getElementById('table-kasus-body');
+            tbody.innerHTML = '';
+            if (!dataKasus || dataKasus.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#888;padding:20px;">Belum ada data kasus. Klik Tambah Kasus untuk mulai menambah.</td></tr>';
+                return;
+            }
+            dataKasus.forEach((item, i) => {
+                const badges = item.gejala_list
+                    ? item.gejala_list.split(',').map(g => `<span class="badge-gejala">${g.trim()}</span>`).join('')
+                    : '<span style="color:#aaa; font-size:0.8rem;">—</span>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><b>${item.kode_kasus}</b></td>
+                        <td>${item.nama_kasus}</td>
+                        <td>${item.nama_penyakit}</td>
+                        <td style="line-height:1.9">${badges}</td>
+                        <td style="text-align:center;"><span class="badge-jml">${item.jumlah_gejala}</span></td>
+                        <td>${item.tanggal_input}</td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="editKasus(${i})" style="padding:5px 10px; background:#007bff;"><i class="fas fa-edit"></i></button>
+                            <button class="btn-primary btn-sm" onclick="hapusKasus('${item.kode_kasus}')" style="padding:5px 10px; background:#dc3545;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function populatePenyakitSelect(selectedKode = '') {
+            const resp = await fetch('api/api_penyakit.php?action=read');
+            const data = await resp.json();
+            const sel = document.getElementById('input-kasus-penyakit');
+            sel.innerHTML = data.map(x => `<option value="${x.kode}" ${x.kode === selectedKode ? 'selected' : ''}>[${x.kode}] ${x.nama}</option>`).join('');
+        }
+
+        async function populateCheckboxGejala(checkedList = []) {
+            const resp = await fetch('api/api_gejala.php?action=read');
+            const data = await resp.json();
+            const container = document.getElementById('checkbox-gejala-container');
+            container.innerHTML = '';
+            data.forEach(g => {
+                const checked = checkedList.includes(g.kode) ? 'checked' : '';
+                container.innerHTML += `
+                    <div class="chk-item">
+                        <input type="checkbox" id="chk_${g.kode}" name="gejala_kasus_check" value="${g.kode}" ${checked}>
+                        <label for="chk_${g.kode}"><b>${g.kode}</b> — ${g.nama}</label>
+                    </div>`;
+            });
+        }
+
+        async function openModalKasus() {
+            document.getElementById('kasus-mode').value    = 'tambah';
+            document.getElementById('input-kasus-kode').readOnly = false;
+            document.getElementById('input-kasus-nama').value    = '';
+            document.getElementById('modal-title-kasus').innerText = 'Tambah Data Kasus Baru';
+            const nextNum = dataKasus.length + 1;
+            document.getElementById('input-kasus-kode').value = 'K' + String(nextNum).padStart(3, '0');
+            await populatePenyakitSelect();
+            await populateCheckboxGejala();
+            document.getElementById('modal-kasus').classList.remove('hidden');
+        }
+
+        async function editKasus(index) {
+            const d = dataKasus[index];
+            document.getElementById('kasus-mode').value    = 'edit';
+            document.getElementById('input-kasus-kode').value    = d.kode_kasus;
+            document.getElementById('input-kasus-kode').readOnly = true;
+            document.getElementById('input-kasus-nama').value    = d.nama_kasus;
+            document.getElementById('modal-title-kasus').innerText = 'Edit Data Kasus';
+            const checked = d.gejala_list ? d.gejala_list.split(',').map(s => s.trim()) : [];
+            await populatePenyakitSelect(d.kode_penyakit);
+            await populateCheckboxGejala(checked);
+            document.getElementById('modal-kasus').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-kasus').classList.add('hidden');
+        }
+
+        async function saveKasus(e) {
+            e.preventDefault();
+            const selectedGejala = [...document.querySelectorAll('input[name="gejala_kasus_check"]:checked')].map(el => el.value);
+            if (selectedGejala.length === 0) { showToast('Pilih minimal satu gejala!', 'error'); return; }
+            const fd = new FormData();
+            fd.append('mode',       document.getElementById('kasus-mode').value);
+            fd.append('kode_kasus', document.getElementById('input-kasus-kode').value);
+            fd.append('nama_kasus', document.getElementById('input-kasus-nama').value);
+            fd.append('penyakit',   document.getElementById('input-kasus-penyakit').value);
+            fd.append('gejala',     JSON.stringify(selectedGejala));
+            const resp = await fetch('api/api_kasus.php?action=save', { method: 'POST', body: fd });
+            const res  = await resp.json();
+            if (res.status === 'success') { closeModal(); loadKasus(); showToast(res.message, 'success'); }
+            else showToast(res.message, 'error');
+        }
+
+        async function hapusKasus(kode) {
+            if (!confirm('Hapus kasus ' + kode + '? Tindakan ini tidak dapat dibatalkan.')) return;
+            const fd = new FormData();
+            fd.append('kode_kasus', kode);
+            await fetch('api/api_kasus.php?action=delete', { method: 'POST', body: fd });
+            loadKasus();
+            showToast('Kasus berhasil dihapus', 'success');
+        }
+
+        function showToast(msg, type = 'success') {
+            let t = document.getElementById('toast-notif');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast-notif';
+                t.style.cssText = 'position:fixed;bottom:24px;right:24px;padding:12px 22px;border-radius:8px;color:#fff;font-family:Poppins,sans-serif;font-size:0.875rem;z-index:9999;opacity:0;transform:translateY(16px);transition:all 0.3s;pointer-events:none;';
+                document.body.appendChild(t);
+            }
+            t.innerText = msg;
+            t.style.background = type === 'success' ? '#2E7D32' : '#c62828';
+            t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+            setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(16px)'; }, 3000);
+        }
+
+        loadKasus();
+    </script>
+</body>
+</html>
