@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // 1. LOAD GEJALA DARI DATABASE (Via API Gejala)
 async function loadGejalaPublic() {
     const container = document.getElementById('public-gejala-list');
+    if (!container) return;
     container.innerHTML = '<p>Memuat data gejala...</p>';
 
     try {
@@ -41,18 +42,18 @@ async function loadRiwayatPublic() {
     }
 }
 
-// 3. PROSES DIAGNOSIS (Kirim ke api_diagnosis.php)
+// 3. PROSES DIAGNOSIS (Mengumpulkan Input User & Mengirim ke Backend CBR)
 async function handlePublicDiagnosis(e) {
     e.preventDefault();
 
-    // Ambil semua checkbox yang dicentang
+    // Mengambil daftar gejala yang dicentang oleh user pada formulir frontend
     const checkboxes = document.querySelectorAll('input[name="gejala_check"]:checked');
     let selectedGejala = [];
     let selectedGejalaNames = [];
 
     checkboxes.forEach((cb) => {
-        selectedGejala.push(cb.value); x
-        // Ambil teks label (biasanya di samping checkbox)
+        selectedGejala.push(cb.value);
+        // Ambil teks label gejala
         const label = document.querySelector(`label[for="${cb.id}"]`).innerText;
         selectedGejalaNames.push(label);
     });
@@ -66,17 +67,19 @@ async function handlePublicDiagnosis(e) {
     const lokasi = document.getElementById('lokasi-kebun').value || "-";
     const btn = document.querySelector('.btn-block');
 
-    // UI Loading
+    // Tampilkan animasi loading pada tombol
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Menganalisis...';
     btn.disabled = true;
 
     try {
-        // KIRIM DATA KE BACKEND
+        // KIRIM DATA KE BACKEND (`api/api_diagnosis.php`)
+        // Proses perhitungan rumus CBR (Manhattan Distance & Similarity) dilakukan sepenuhnya 
+        // di sisi server (backend) pada file `api_diagnosis.php` demi keamanan dan performa.
         const response = await fetch('api/api_diagnosis.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                gejala: selectedGejala,
+                gejala: selectedGejala, // Array kode gejala yang dipilih (contoh: ['G001', 'G003'])
                 nama: nama,
                 lokasi: lokasi
             })
@@ -145,6 +148,7 @@ function resetDiagnosis() {
 function renderHistoryTable(data) {
     const tbody = document.getElementById('history-body');
     const noData = document.getElementById('no-data-msg');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     if (data.length === 0) {
