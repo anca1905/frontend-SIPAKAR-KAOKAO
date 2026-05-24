@@ -1,34 +1,173 @@
-// --- SAAT HALAMAN DIMUAT ---
+// --- HELPER NOTIFIKASI MODERN ---
+function showNotification(title, message, icon = 'info') {
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            title: title,
+            text: message,
+            icon: icon,
+            confirmButtonColor: '#2E7D32',
+            iconColor: icon === 'success' ? '#2E7D32' : (icon === 'warning' ? '#c8a400' : undefined)
+        });
+    } else {
+        alert(message);
+    }
+}
+
+// --- VARIABEL GLOBAL ---
 let riwayatData = [];
+let allSymptomData = [];
+let selectedGejalaCodes = [];
+let currentTab = 'all';
+let currentSearch = '';
+
+// --- SAAT HALAMAN DIMUAT ---
 document.addEventListener("DOMContentLoaded", () => {
-    loadGejalaPublic(); // Ambil gejala dari database
-    loadRiwayatPublic(); // Ambil tabel riwayat dari database
+    // Cek apakah elemen 'public-gejala-list' ada di halaman saat ini (diagnosis.html)
+    if (document.getElementById('public-gejala-list')) {
+        loadGejalaPublic(); 
+    }
+
+    // Cek apakah elemen tabel riwayat ada di halaman saat ini (riwayat.html)
+    if (document.getElementById('history-body')) {
+        loadRiwayatPublic(); 
+    }
 });
+
+// Helper: Klasifikasi gejala secara dinamis berdasarkan kata kunci namanya
+function getSymptomCategory(symptomName) {
+    const name = symptomName.toLowerCase();
+    if (name.includes('buah') || name.includes('biji')) {
+        return 'buah';
+    } else if (name.includes('daun') || name.includes('pucuk') || name.includes('keriting') || name.includes('bercak')) {
+        return 'daun';
+    } else if (name.includes('batang') || name.includes('cabang') || name.includes('ranting') || name.includes('kulit') || name.includes('kayu') || name.includes('larva')) {
+        return 'batang';
+    } else {
+        return 'lainnya';
+    }
+}
 
 // 1. LOAD GEJALA DARI DATABASE (Via API Gejala)
 async function loadGejalaPublic() {
     const container = document.getElementById('public-gejala-list');
     if (!container) return;
-    container.innerHTML = '<p>Memuat data gejala...</p>';
+    container.innerHTML = `
+        <div style="grid-column: 1/-1; text-align: center; padding: 20px;">
+            <i class="fas fa-circle-notch fa-spin" style="color: var(--primary-glow); font-size: 1.5rem; margin-bottom: 10px;"></i>
+            <p style="color: var(--text-muted);">Menghubungkan ke basis pengetahuan kakao...</p>
+        </div>
+    `;
 
     try {
-        // Kita pakai api_gejala.php yang sudah dibuat sebelumnya
         const response = await fetch('api/api_gejala.php?action=read');
-        const data = await response.json();
-
-        container.innerHTML = '';
-        data.forEach(g => {
-            container.innerHTML += `
-                <div class="gejala-item">
-                    <input type="checkbox" id="${g.kode}" name="gejala_check" value="${g.kode}">
-                    <label for="${g.kode}">[${g.kode}] ${g.nama}</label>
-                </div>
-            `;
-        });
+        allSymptomData = await response.json();
+        renderSymptoms();
     } catch (error) {
         console.error(error);
-        container.innerHTML = '<p style="color:red">Gagal memuat gejala.</p>';
+        container.innerHTML = '<p style="color:#ef4444; grid-column: 1/-1; text-align:center; padding:20px;">Gagal memuat basis data gejala dari server.</p>';
     }
+}
+
+// Render Checkbox Gejala dengan Filter Tab & Live Search
+function renderSymptoms() {
+    const container = document.getElementById('public-gejala-list');
+    if (!container) return;
+
+    let filtered = allSymptomData;
+
+    // Filter berdasarkan Pencarian Kata Kunci
+    if (currentSearch.trim() !== '') {
+        const query = currentSearch.toLowerCase();
+        filtered = filtered.filter(g => 
+            g.nama.toLowerCase().includes(query) || 
+            g.kode.toLowerCase().includes(query)
+        );
+    }
+
+    // Filter berdasarkan Tab Kategori Plant Parts
+    if (currentTab !== 'all') {
+        filtered = filtered.filter(g => getSymptomCategory(g.nama) === currentTab);
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 30px; color: #666;">
+                <i class="fas fa-search-minus" style="font-size: 2rem; margin-bottom: 10px; color: #aaa;"></i>
+                <p>Tidak ada gejala yang cocok dengan kriteria filter Anda.</p>
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = '';
+    filtered.forEach(g => {
+        const isChecked = selectedGejalaCodes.includes(g.kode) ? 'checked' : '';
+        const cardClass = isChecked ? 'gejala-cyber-card checked' : 'gejala-cyber-card';
+
+        // Tampilan Card Custom
+        container.innerHTML += `
+            <div class="${cardClass}" onclick="toggleSymptomCard('${g.kode}', event)" style="cursor:pointer; display:flex; gap:10px; align-items:flex-start; margin-bottom:10px;">
+                <input type="checkbox" id="${g.kode}" name="gejala_check" value="${g.kode}" ${isChecked} onchange="handleCheckboxChange('${g.kode}')" style="margin-top:4px;">
+                <label for="${g.kode}" class="gejala-cyber-label" style="cursor:pointer; margin:0;"><b>[${g.kode}]</b> ${g.nama}</label>
+            </div>
+        `;
+    });
+}
+
+// Klik area kartu gejala untuk mencentang otomatis
+function toggleSymptomCard(code, event) {
+    if (event.target.type === 'checkbox' || event.target.tagName === 'LABEL') return;
+    const cb = document.getElementById(code);
+    if (!cb) return;
+
+    cb.checked = !cb.checked;
+    handleCheckboxChange(code);
+}
+
+// Menangani perubahan status checkbox dan menyimpan state secara global
+function handleCheckboxChange(code) {
+    const cb = document.getElementById(code);
+    if (!cb) return;
+
+    const card = cb.closest('.gejala-cyber-card');
+
+    if (cb.checked) {
+        if (!selectedGejalaCodes.includes(code)) selectedGejalaCodes.push(code);
+        if (card) card.classList.add('checked');
+    } else {
+        selectedGejalaCodes = selectedGejalaCodes.filter(c => c !== code);
+        if (card) card.classList.remove('checked');
+    }
+    updateSubmitButton();
+}
+
+// Update teks tombol diagnosis secara dinamis dengan hitungan gejala terpilih
+function updateSubmitButton() {
+    const btn = document.getElementById('btn-submit-diagnosis') || document.querySelector('.btn-diagnose') || document.querySelector('.btn-block');
+    if (!btn) return;
+
+    if (selectedGejalaCodes.length > 0) {
+        btn.innerHTML = `<i class="fas fa-calculator"></i> Analisis Kondisi Tanaman (${selectedGejalaCodes.length} Gejala Terpilih)`;
+    } else {
+        btn.innerHTML = `<i class="fas fa-search"></i> Analisis Kondisi Tanaman`;
+    }
+}
+
+// Filter Tab Gejala (Jika Kamu Pakai Tab UI Nanti)
+function filterSymptomTab(tab, element) {
+    currentTab = tab;
+    const buttons = document.querySelectorAll('.terminal-tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if (element) element.classList.add('active');
+    renderSymptoms();
+}
+
+// Live Search Gejala (Jika Kamu Pakai Input Search Nanti)
+function searchSymptoms() {
+    const searchInput = document.getElementById('symptom-search');
+    if (!searchInput) return;
+    currentSearch = searchInput.value;
+    renderSymptoms();
 }
 
 // 2. LOAD RIWAYAT UNTUK TABEL PUBLIC
@@ -46,40 +185,26 @@ async function loadRiwayatPublic() {
 async function handlePublicDiagnosis(e) {
     e.preventDefault();
 
-    // Mengambil daftar gejala yang dicentang oleh user pada formulir frontend
-    const checkboxes = document.querySelectorAll('input[name="gejala_check"]:checked');
-    let selectedGejala = [];
-    let selectedGejalaNames = [];
-
-    checkboxes.forEach((cb) => {
-        selectedGejala.push(cb.value);
-        // Ambil teks label gejala
-        const label = document.querySelector(`label[for="${cb.id}"]`).innerText;
-        selectedGejalaNames.push(label);
-    });
-
-    if (selectedGejala.length === 0) {
-        alert("Pilih minimal satu gejala!");
+    if (selectedGejalaCodes.length === 0) {
+        showNotification('Gejala Belum Dipilih', "Silahkan pilih minimal satu gejala tanaman kakao Anda!", 'warning');
         return;
     }
 
-    const nama = document.getElementById('petani-name').value || "Petani Umum";
-    const lokasi = document.getElementById('lokasi-kebun').value || "-";
-    const btn = document.querySelector('.btn-block');
+    const nama = document.getElementById('petani-name') ? document.getElementById('petani-name').value || "Petani Umum" : "Petani Umum";
+    const lokasi = document.getElementById('lokasi-kebun') ? document.getElementById('lokasi-kebun').value || "-" : "-";
+    const btn = document.getElementById('btn-submit-diagnosis') || document.querySelector('.btn-diagnose') || document.querySelector('.btn-block');
+    if (!btn) return;
 
-    // Tampilkan animasi loading pada tombol
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sedang Menganalisis...';
+    const origText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menganalisis...';
     btn.disabled = true;
 
     try {
-        // KIRIM DATA KE BACKEND (`api/api_diagnosis.php`)
-        // Proses perhitungan rumus CBR (Manhattan Distance & Similarity) dilakukan sepenuhnya 
-        // di sisi server (backend) pada file `api_diagnosis.php` demi keamanan dan performa.
         const response = await fetch('api/api_diagnosis.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                gejala: selectedGejala, // Array kode gejala yang dipilih (contoh: ['G001', 'G003'])
+                gejala: selectedGejalaCodes,
                 nama: nama,
                 lokasi: lokasi
             })
@@ -89,62 +214,114 @@ async function handlePublicDiagnosis(e) {
 
         if (result.status === 'success') {
             if (result.hasil === null || !result.penyakit) {
-                alert(result.message || "Tidak ditemukan penyakit yang cocok dengan gejala yang dipilih.");
+                showNotification('Diagnosis Selesai', result.message || "Tidak ditemukan kasus penyakit yang cocok.", 'info');
             } else {
-                // POPULASI DATA KE UI BARU
+                
+                // MENGISI DATA KE HTML (Sesuai ID di diagnosis.html terbaru)
+                const elPenyakit = document.getElementById('res-penyakit');
+                const elNilai = document.getElementById('res-nilai');
+                const elKasusRef = document.getElementById('res-kasus-ref');
+                const elSolusi = document.getElementById('res-solusi');
+                const detailList = document.getElementById('detail-list');
 
-                // 1. Identitas
-                document.getElementById('res-nama-petani').innerText = nama;
-                document.getElementById('res-alamat-petani').innerText = lokasi;
+                if(elPenyakit) elPenyakit.innerText = result.penyakit;
+                if(elNilai) elNilai.innerText = result.nilai + "%";
+                if(elKasusRef) elKasusRef.innerText = result.kasus_referensi || "-";
+                if(elSolusi) elSolusi.innerHTML = result.solusi;
 
-                // 2. Daftar Gejala yang dipilih
-                const gejalaListUI = document.getElementById('res-gejala-list');
-                gejalaListUI.innerHTML = '';
-                selectedGejalaNames.forEach(gName => {
-                    gejalaListUI.innerHTML += `<li>${gName}</li>`;
-                });
+                // Isi Info Panel: Nama, Lokasi, Gejala Terpilih
+                const elNama   = document.getElementById('res-nama');
+                const elLokasi = document.getElementById('res-lokasi');
+                const elCount  = document.getElementById('res-gejala-count');
+                const elTags   = document.getElementById('res-gejala-tags');
 
-                // 3. Persentase Semua Penyakit
-                const percentListUI = document.getElementById('res-all-percentages');
-                percentListUI.innerHTML = '';
-                if (result.detail_perhitungan) {
-                    result.detail_perhitungan.forEach(dp => {
-                        percentListUI.innerHTML += `<li>Persentase Tanaman Kakao Terserang ${dp.nama} Sebesar ${dp.persen}%</li>`;
+                if(elNama)   elNama.innerText   = nama;
+                if(elLokasi) elLokasi.innerText = lokasi !== '-' ? lokasi : 'Tidak disebutkan';
+                if(elCount)  elCount.innerText  = selectedGejalaCodes.length;
+
+                if(elTags) {
+                    elTags.innerHTML = '';
+                    selectedGejalaCodes.forEach(kode => {
+                        // Cari nama gejala dari allSymptomData
+                        const gejala = allSymptomData.find(g => g.kode === kode);
+                        const label  = gejala ? `[${kode}] ${gejala.nama}` : kode;
+                        elTags.innerHTML += `<span style="display:inline-flex;align-items:center;gap:5px;background:#e8f5e9;color:#1B5E20;border:1px solid #a5d6a7;border-radius:20px;padding:3px 10px;font-size:0.78rem;font-weight:600;">
+                            <i class="fas fa-check" style="font-size:0.65rem;"></i>${label}
+                        </span>`;
                     });
                 }
 
-                // 4. Ringkasan Hasil
-                document.getElementById('res-penyakit-name').innerText = result.penyakit;
-                document.getElementById('res-penyakit-percent').innerText = result.nilai + "%";
+                // Isi kalimat kesimpulan diagnosis
+                const elSummary = document.getElementById('res-summary-text');
+                if (elSummary) {
+                    elSummary.innerHTML = `Dilihat dari hasil perhitungan setiap penyakit yang tertera, tanaman kakao Anda terdiagnosis terjangkit penyakit <strong>${result.penyakit}</strong> dengan nilai jarak terkecil diperoleh pada <strong>${result.kasus_referensi || '-'}</strong> dengan nilai jarak City Block sebesar <strong>${result.distance}</strong>.`;
+                }
 
-                // 5. Solusi
-                document.getElementById('res-solusi-list').innerHTML = result.solusi;
+                // Mengisi Tabel Rincian Manhattan Distance
+                if(detailList) {
+                    detailList.innerHTML = '';
+                    if (result.detail_perhitungan) {
+                        result.detail_perhitungan.forEach(dp => {
+                            const isWinner = dp.nama === result.penyakit;
+                            detailList.innerHTML += `
+                                <tr style="${isWinner ? 'background:#e8f5e9; font-weight:600;' : ''}">
+                                    <td style="border: 1px solid #ddd; padding: 8px;">
+                                        ${isWinner ? '<i class="fas fa-check-circle" style="color:#2E7D32;margin-right:6px;"></i>' : ''}${dp.nama}
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; font-size:0.82rem; color:#666;">${dp.kasus_ref || '-'}</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">
+                                        <strong>${dp.distance}</strong>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
 
-                // Munculkan Kotak Hasil
-                document.getElementById('diagnosis-result').classList.remove('hidden');
-                document.getElementById('diagnosis-result').scrollIntoView({ behavior: 'smooth' });
+                // Tampilkan Kotak Laporan
+                const resultBox = document.getElementById('diagnosis-result');
+                if(resultBox) {
+                    resultBox.classList.remove('hidden');
+                    resultBox.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                // Alert Sukses Diagnosa
+                showNotification('Diagnosis Berhasil!', `Tanaman kakao terdiagnosis mengidap: ${result.penyakit} dengan nilai kemiripan ${result.nilai}%.`, 'success');
 
                 loadRiwayatPublic();
             }
         } else {
-            alert("Terjadi kesalahan: " + result.message);
+            showNotification('Kesalahan Sistem', "Terjadi kesalahan sistem: " + result.message, 'error');
         }
 
     } catch (error) {
         console.error('Error:', error);
-        alert("Gagal menghubungi server.");
+        showNotification('Kesalahan Koneksi', "Gagal menghubungi server database.", 'error');
     } finally {
-        btn.innerText = 'Cek Kondisi Tanaman';
+        btn.innerHTML = origText;
         btn.disabled = false;
+        updateSubmitButton();
     }
 }
+
+// Reset Diagnosis Mandiri
 function resetDiagnosis() {
-    document.getElementById('public-diagnosis-form').reset();
-    document.getElementById('diagnosis-result').classList.add('hidden');
+    const form = document.getElementById('public-diagnosis-form');
+    if (form) form.reset();
+    selectedGejalaCodes = [];
+    updateSubmitButton();
+    
+    const cards = document.querySelectorAll('.gejala-cyber-card');
+    cards.forEach(c => c.classList.remove('checked'));
+
+    const resBox = document.getElementById('diagnosis-result');
+    if(resBox) resBox.classList.add('hidden');
+    
+    const diagArea = document.getElementById('diagnosis-area');
+    if (diagArea) diagArea.scrollIntoView({ behavior: 'smooth' });
 }
 
-// ... (Fungsi renderHistoryTable dan filter tetap sama, tinggal sesuaikan datanya nanti) ...
-
+// 4. RENDERING TABEL RIWAYAT DIGITAL
 function renderHistoryTable(data) {
     const tbody = document.getElementById('history-body');
     const noData = document.getElementById('no-data-msg');
@@ -152,26 +329,27 @@ function renderHistoryTable(data) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        noData.classList.remove('hidden');
+        if (noData) noData.classList.remove('hidden');
         return;
     } else {
-        noData.classList.add('hidden');
+        if (noData) noData.classList.add('hidden');
     }
 
     data.forEach((item, index) => {
         tbody.innerHTML += `
             <tr>
-                <td>${index + 1}</td>
+                <td style="text-align:center;">${index + 1}</td>
                 <td>${item.tgl}</td>
                 <td>${item.nama}</td>
                 <td>${item.lokasi}</td>
                 <td><span style="color:#2E7D32; font-weight:bold;">${item.hasil}</span></td>
-                <td><span class="badge" style="background:#17a2b8; color:#fff">${item.nilai}</span></td>
+                <td style="text-align:center;"><span class="badge" style="background:#17a2b8; color:white;">${item.nilai}</span></td>
             </tr>
         `;
     });
 }
 
+// Filter Riwayat data
 function applyFilter() {
     const startDate = document.getElementById('filter-start').value;
     const endDate = document.getElementById('filter-end').value;
@@ -183,7 +361,6 @@ function applyFilter() {
 
         if (startDate && item.tgl < startDate) validDate = false;
         if (endDate && item.tgl > endDate) validDate = false;
-
         if (penyakit !== 'all' && item.hasil !== penyakit) validPenyakit = false;
 
         return validDate && validPenyakit;
@@ -192,6 +369,7 @@ function applyFilter() {
     renderHistoryTable(filteredData);
 }
 
+// Reset Filter Riwayat
 function resetFilter() {
     document.getElementById('filter-start').value = '';
     document.getElementById('filter-end').value = '';
@@ -199,28 +377,25 @@ function resetFilter() {
     renderHistoryTable(riwayatData);
 }
 
-function scrollToDiagnosis() {
-    document.getElementById('diagnosis-area').scrollIntoView({ behavior: 'smooth' });
-}
-
+// 5. EDUKASI DATA MODAL POPUP
 const eduData = {
     'busuk-buah': {
-        title: 'Busuk Buah (Phytophthora)',
+        title: 'Penyakit Busuk Buah (Phytophthora)',
         img: 'https://distan.bulelengkab.go.id/uploads/konten/88_mengatasi-busuk-buah-pada-tanaman-kakao.jpg',
-        desc: 'Penyakit ini disebabkan oleh jamur Phytophthora palmivora. Gejala awalnya adalah bercak coklat pada buah yang kemudian meluas hingga menutupi seluruh permukaan buah.',
-        solusi: '1. Petik buah busuk sesering mungkin.<br>2. Lakukan pemangkasan pohon pelindung untuk mengurangi kelembapan.<br>3. Semprotkan fungisida tembaga jika serangan parah.'
+        desc: 'Busuk buah kakao disebabkan oleh cendawan oomiset Phytophthora palmivora. Penyakit ini berkembang sangat hebat pada kondisi kebun yang sangat lembap, curah hujan tinggi, kerapatan pohon berlebih, atau naungan yang terlalu rimbun.',
+        solusi: '1. Petik buah yang membusuk sesering mungkin untuk memotong siklus spora.<br>2. Lakukan pemangkasan tajuk tanaman pelindung.<br>3. Aplikasi fungisida kontak berbahan aktif Tembaga (Copper Hydroxide) jika diperlukan.'
     },
     'pbk': {
         title: 'Hama Penggerek Buah Kakao (PBK)',
         img: 'https://gokomodo.com/_next/image?url=https%3A%2F%2Fgkmdblog.s3.ap-southeast-1.amazonaws.com%2Fwp-content%2Fuploads%2F2023%2F10%2F13180428%2FBlog-Hama-Tanaman.jpg&w=1080&q=75',
-        desc: 'Hama ini adalah ulat kecil yang merusak biji dari dalam. Gejala khasnya adalah buah matang sebelum waktunya (belang kuning-hijau) dan jika dibelah bijinya saling melekat.',
-        solusi: '1. Lakukan penyelubungan buah (sarungisasi).<br>2. Panen sering (setiap minggu).<br>3. Pemangkasan teratur.'
+        desc: 'Hama utama Penggerek Buah Kakao disebabkan oleh ngengat Conopomorpha cramerella. Ciri serangan khas berupa warna buah yang matang tidak merata sebelum waktunya (belang hijau-kuning), dan jika dibelah biji-biji saling melengket keras.',
+        solusi: '1. Selubungi buah kakao muda (Teknik Sarungisasi/Kondomisasi).<br>2. Lakukan pemanenan sering terjadwal setiap 7-10 hari sekali.<br>3. Jaga sirkulasi kebun dan kembangkan musuh alami ngengat PBK.'
     },
     'kanker': {
-        title: 'Penyakit Kanker Batang',
+        title: 'Penyakit Kanker Batang Kakao',
         img: 'https://balittri.litbang.pertanian.go.id/images/kankerbatang.jpg',
-        desc: 'Ditandai dengan adanya cairan merah seperti karat pada kulit batang. Bagian kulit yang terserang akan membusuk dan berwarna hitam di bagian dalam.',
-        solusi: '1. Kupas kulit batang yang sakit sampai batas jaringan sehat.<br>2. Oleskan fungisida pada luka kupasan.<br>3. Bakar kulit hasil kupasan.'
+        desc: 'Kanker Batang disebabkan oleh patogen jamur Phytophthora palmivora. Gejalanya ditandai kulit batang/cabang tampak membusuk basah dan mengeluarkan eksudat lendir kemerahan mirip cairan karat besi atau getah kehitaman.',
+        solusi: '1. Kupas atau kerok kulit batang yang membusuk basah menggunakan pisau tajam steril.<br>2. Oleskan bubur fungisida berbahan aktif Tembaga Oksida.<br>3. Selalu bersihkan alat kerja menggunakan alkohol 70%.'
     }
 };
 
@@ -229,21 +404,25 @@ function openModal(id) {
     if (!data) return;
 
     const modalBody = document.getElementById('modal-body-content');
+    if (!modalBody) return;
+
     modalBody.innerHTML = `
-        <img src="${data.img}" class="modal-img-full" alt="${data.title}">
-        <h2 style="color:#2E7D32; margin-bottom:10px;">${data.title}</h2>
-        <p style="margin-bottom:15px; line-height:1.6;">${data.desc}</p>
-        <div style="background:#f1f8e9; padding:15px; border-radius:8px;">
-            <strong><i class="fas fa-check-circle"></i> Cara Pengendalian:</strong>
-            <p style="margin-top:5px; font-size:0.9rem;">${data.solusi}</p>
+        <img src="${data.img}" style="width:100%; border-radius:8px; margin-bottom:15px;" alt="${data.title}">
+        <h2 style="color:#2E7D32; margin-bottom:15px; font-weight:bold;">${data.title}</h2>
+        <p style="margin-bottom:20px; line-height:1.6; color:#555;">${data.desc}</p>
+        <div style="background:#e8f5e9; padding:15px; border-radius:8px; border-left:4px solid #2E7D32;">
+            <strong style="color:#2E7D32;"><i class="fas fa-check-circle"></i> Protokol Pengendalian:</strong>
+            <p style="margin-top:10px; font-size:0.95rem; line-height:1.6; color:#333;">${data.solusi}</p>
         </div>
     `;
 
-    document.getElementById('edu-modal').classList.remove('hidden');
+    const modal = document.getElementById('edu-modal');
+    if (modal) modal.classList.remove('hidden');
 }
 
 function closeModal() {
-    document.getElementById('edu-modal').classList.add('hidden');
+    const modal = document.getElementById('edu-modal');
+    if (modal) modal.classList.add('hidden');
 }
 
 window.onclick = function (event) {

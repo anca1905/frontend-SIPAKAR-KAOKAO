@@ -1,125 +1,437 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edukasi & Artikel - Sistem CBR Kakao</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Edukasi & Artikel – SIPAKAR KAKAO</title>
+    <meta name="description" content="Pusat edukasi petani kakao. Panduan teknis, artikel terkini tentang hama dan penyakit kakao dari para ahli.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        /* ── Edukasi-specific styles only ── */
+        .edu-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 56px 24px 80px;
+        }
+
+        /* Category filter tabs */
+        .cat-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .cat-tab {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #ddd;
+            background: white;
+            color: #666;
+            font-family: inherit;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .cat-tab:hover             { border-color: #2E7D32; color: #2E7D32; }
+        .cat-tab.active            { background: #1B5E20; border-color: #1B5E20; color: white; }
+        .cat-tab.hama.active       { background: #c8a400; border-color: #c8a400; color: #1a1200; }
+
+        /* Badge total artikel */
+        .article-count-badge {
+            background: #e8f5e9;
+            color: #2E7D32;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 50px;
+            border: 1px solid #c8e6c9;
+            white-space: nowrap;
+        }
+
+        /* Article list */
+        .article-list { display: flex; flex-direction: column; gap: 22px; }
+
+        .article-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+            transition: transform 0.28s, box-shadow 0.28s;
+        }
+        .article-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.11);
+        }
+        .article-image {
+            position: relative;
+            overflow: hidden;
+            min-height: 230px;
+        }
+        .article-image img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .article-card:hover .article-image img { transform: scale(1.07); }
+
+        .category-badge {
+            position: absolute;
+            top: 14px; left: 14px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .category-badge.penyakit { background: #1B5E20; color: white; }
+        .category-badge.hama     { background: #c8a400; color: #1a1200; }
+
+        .article-content {
+            padding: 30px 36px;
+            display: flex;
+            flex-direction: column;
+        }
+        .article-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.78rem;
+            color: #bbb;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .article-meta span { display: flex; align-items: center; gap: 5px; }
+        .article-meta i { color: #2E7D32; }
+        .article-content h3 {
+            font-size: 1.18rem;
+            font-weight: 800;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .article-content h3 a { color: inherit; transition: color 0.2s; }
+        .article-content h3 a:hover { color: #2E7D32; }
+        .article-excerpt {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 22px;
+            flex: 1;
+        }
+        .article-footer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 22px;
+            background: #e8f5e9;
+            color: #1B5E20;
+            font-weight: 700;
+            font-size: 0.84rem;
+            border-radius: 50px;
+            transition: background 0.2s, color 0.2s, gap 0.2s;
+        }
+        .read-more:hover { background: #1B5E20; color: white; gap: 12px; }
+        .article-tag {
+            font-size: 0.74rem;
+            color: #bbb;
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid #eee;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed; inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(5px);
+        }
+        .modal.hidden { display: none; }
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            max-width: 700px; width: 92%;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 44px;
+            position: relative;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.22);
+            animation: modalIn 0.3s cubic-bezier(.34,1.56,.64,1);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-close-btn {
+            position: absolute; top: 18px; right: 20px;
+            width: 36px; height: 36px;
+            background: #f0f0f0; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; cursor: pointer; color: #666;
+            transition: background 0.2s, color 0.2s;
+        }
+        .modal-close-btn:hover { background: #e0e0e0; color: #222; }
+
+        @media (max-width: 720px) {
+            .article-card { grid-template-columns: 1fr; }
+            .article-image { min-height: 200px; }
+            .article-content { padding: 22px 20px; }
+        }
+    </style>
 </head>
+<body class="inner-page">
 
-<body>
-
-    <nav class="navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <span style="color:#2E7D32; font-weight:800;">SISTEM CBR</span> KAKAO
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html">Beranda</a></li>
-                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
-                <li><a href="#" class="active">Edukasi</a></li>
-                <li><a href="riwayat.html">Riwayat</a></li>
-                <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
+    <!-- NAVBAR -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <span class="logo-text"><strong>SIPAKAR</strong> KAKAO</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html"     class="nav-link">Beranda</a></li>
+                <li><a href="diagnosis.html" class="nav-link">Diagnosis</a></li>
+                <li><a href="edukasi.html"   class="nav-link active">Edukasi</a></li>
+                <li><a href="riwayat.html"   class="nav-link">Riwayat</a></li>
             </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-nav-login"><i class="fas fa-user-shield"></i> Login Admin</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <header class="hero small-hero" style="height: 40vh; min-height: 250px;">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <h1>Pusat Edukasi Petani</h1>
-            <p>Informasi terkini dan panduan teknis pengendalian hama & penyakit kakao.</p>
+    <!-- PAGE HERO -->
+    <div class="page-hero">
+        <div class="section-label"><i class="fas fa-book-open"></i>&nbsp; Pusat Edukasi</div>
+        <h1>Edukasi &amp; Artikel Kakao</h1>
+        <p>Informasi terkini dan panduan teknis pengendalian hama &amp; penyakit kakao dari para ahli pertanian terpercaya.</p>
+    </div>
+
+    <!-- KONTEN EDUKASI -->
+    <div class="edu-wrapper">
+
+        <!-- Header -->
+        <div class="content-header">
+            <div class="content-header-left">
+                <h2>Artikel Terbaru</h2>
+                <p>Panduan praktis langsung dari lapangan &amp; riset para pakar</p>
+            </div>
+            <span class="article-count-badge"><i class="fas fa-newspaper"></i>&nbsp; 3 Artikel</span>
         </div>
-    </header>
 
-    <section class="section-padding bg-white">
-        <div class="container">
-            <div class="article-list">
+        <!-- Filter tabs -->
+        <div class="cat-tabs">
+            <button class="cat-tab active"  onclick="filterCat(this,'all')">Semua</button>
+            <button class="cat-tab penyakit" onclick="filterCat(this,'penyakit')"><i class="fas fa-bacterium"></i> Penyakit</button>
+            <button class="cat-tab hama"     onclick="filterCat(this,'hama')"><i class="fas fa-bug"></i> Hama</button>
+        </div>
 
-                <article class="article-card">
-                    <div class="article-image">
-                        <img src="https://distan.bulelengkab.go.id/uploads/konten/88_mengatasi-busuk-buah-pada-tanaman-kakao.jpg"
-                            alt="Busuk Buah">
-                        <span class="category-badge penyakit">Penyakit</span>
-                    </div>
-                    <div class="article-content">
-                        <div class="article-meta">
-                            <span><i class="far fa-calendar-alt"></i> 12 Mei 2025</span>
-                            <span><i class="far fa-user"></i> Admin BPP Toari</span>
-                        </div>
-                        <h3><a href="#" onclick="openModal('busuk-buah')">Waspada Penyakit Busuk Buah (Phytophthora) di
-                                Musim Hujan</a></h3>
-                        <p>Penyakit busuk buah kakao merupakan salah satu ancaman terbesar bagi petani. Penyakit ini
-                            disebabkan oleh jamur Phytophthora palmivora yang berkembang pesat saat kelembapan tinggi...
-                        </p>
-                        <a href="#" class="read-more" onclick="openModal('busuk-buah')">Baca Selengkapnya <i
-                                class="fas fa-arrow-right"></i></a>
-                    </div>
-                </article>
+        <!-- Article list -->
+        <div class="article-list" id="articleList">
 
-                <article class="article-card">
-                    <div class="article-image">
-                        <img src="https://gokomodo.com/_next/image?url=https%3A%2F%2Fgkmdblog.s3.ap-southeast-1.amazonaws.com%2Fwp-content%2Fuploads%2F2023%2F10%2F13180428%2FBlog-Hama-Tanaman.jpg&w=1080&q=75"
-                            alt="PBK">
-                        <span class="category-badge hama">Hama</span>
+            <article class="article-card" data-cat="penyakit">
+                <div class="article-image">
+                    <img src="https://distan.bulelengkab.go.id/uploads/konten/88_mengatasi-busuk-buah-pada-tanaman-kakao.jpg" alt="Busuk Buah Kakao">
+                    <span class="category-badge penyakit"><i class="fas fa-bacterium"></i> Penyakit</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 12 Mei 2025</span>
+                        <span><i class="far fa-user"></i> Admin BPP Toari</span>
+                        <span><i class="far fa-clock"></i> 4 menit baca</span>
                     </div>
-                    <div class="article-content">
-                        <div class="article-meta">
-                            <span><i class="far fa-calendar-alt"></i> 10 Mei 2025</span>
-                            <span><i class="far fa-user"></i> Admin BPP Toari</span>
-                        </div>
-                        <h3><a href="#" onclick="openModal('pbk')">Teknik Sarungisasi untuk Mencegah Hama Penggerek Buah
-                                (PBK)</a></h3>
-                        <p>Hama Penggerek Buah Kakao (PBK) seringkali merusak biji dari dalam. Salah satu metode
-                            pengendalian yang paling efektif dan ramah lingkungan adalah dengan teknik penyelubungan
-                            buah...</p>
-                        <a href="#" class="read-more" onclick="openModal('pbk')">Baca Selengkapnya <i
-                                class="fas fa-arrow-right"></i></a>
+                    <h3><a href="#" onclick="openModal('busuk-buah'); return false;">Waspada Penyakit Busuk Buah (Phytophthora) di Musim Hujan</a></h3>
+                    <p class="article-excerpt">Penyakit busuk buah kakao merupakan salah satu ancaman terbesar bagi petani. Penyakit ini disebabkan oleh jamur <em>Phytophthora palmivora</em> yang berkembang pesat saat kelembapan tinggi dan hujan intens di musim penghujan.</p>
+                    <div class="article-footer-row">
+                        <a href="#" class="read-more" onclick="openModal('busuk-buah'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
+                        <span class="article-tag">Phytophthora</span>
                     </div>
-                </article>
+                </div>
+            </article>
 
-                <article class="article-card">
-                    <div class="article-image">
-                        <img src="https://balittri.litbang.pertanian.go.id/images/kankerbatang.jpg" alt="Kanker Batang">
-                        <span class="category-badge penyakit">Penyakit</span>
+            <article class="article-card" data-cat="hama">
+                <div class="article-image">
+                    <img src="https://gokomodo.com/_next/image?url=https%3A%2F%2Fgkmdblog.s3.ap-southeast-1.amazonaws.com%2Fwp-content%2Fuploads%2F2023%2F10%2F13180428%2FBlog-Hama-Tanaman.jpg&w=1080&q=75" alt="Hama PBK">
+                    <span class="category-badge hama"><i class="fas fa-bug"></i> Hama</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 10 Mei 2025</span>
+                        <span><i class="far fa-user"></i> Admin BPP Toari</span>
+                        <span><i class="far fa-clock"></i> 5 menit baca</span>
                     </div>
-                    <div class="article-content">
-                        <div class="article-meta">
-                            <span><i class="far fa-calendar-alt"></i> 05 Mei 2025</span>
-                            <span><i class="far fa-user"></i> Pakar Kakao</span>
-                        </div>
-                        <h3><a href="#" onclick="openModal('kanker')">Mengenal Gejala Kanker Batang dan Cara
-                                Pengupasannya</a></h3>
-                        <p>Jika batang kakao Anda mengeluarkan cairan merah seperti karat, waspadalah. Itu adalah tanda
-                            kanker batang yang bisa mematikan pohon jika tidak segera ditangani dengan pengupasan
-                            kulit...</p>
-                        <a href="#" class="read-more" onclick="openModal('kanker')">Baca Selengkapnya <i
-                                class="fas fa-arrow-right"></i></a>
+                    <h3><a href="#" onclick="openModal('pbk'); return false;">Teknik Sarungisasi untuk Mencegah Hama Penggerek Buah (PBK)</a></h3>
+                    <p class="article-excerpt">Hama Penggerek Buah Kakao (PBK) seringkali merusak biji dari dalam buah tanpa terlihat dari luar. Salah satu metode pengendalian yang paling efektif dan ramah lingkungan adalah teknik penyelubungan buah muda.</p>
+                    <div class="article-footer-row">
+                        <a href="#" class="read-more" onclick="openModal('pbk'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
+                        <span class="article-tag">Conopomorpha cramerella</span>
                     </div>
-                </article>
+                </div>
+            </article>
 
+            <article class="article-card" data-cat="penyakit">
+                <div class="article-image">
+                    <img src="https://balittri.litbang.pertanian.go.id/images/kankerbatang.jpg" alt="Kanker Batang Kakao">
+                    <span class="category-badge penyakit"><i class="fas fa-bacterium"></i> Penyakit</span>
+                </div>
+                <div class="article-content">
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar-alt"></i> 05 Mei 2025</span>
+                        <span><i class="far fa-user"></i> Pakar Kakao</span>
+                        <span><i class="far fa-clock"></i> 4 menit baca</span>
+                    </div>
+                    <h3><a href="#" onclick="openModal('kanker'); return false;">Mengenal Gejala Kanker Batang dan Cara Pengupasannya</a></h3>
+                    <p class="article-excerpt">Jika batang kakao Anda mengeluarkan cairan merah seperti karat, waspadalah. Itu adalah tanda kanker batang yang bisa mematikan pohon jika tidak segera ditangani dengan teknik pengupasan kulit yang benar dan tepat waktu.</p>
+                    <div class="article-footer-row">
+                        <a href="#" class="read-more" onclick="openModal('kanker'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
+                        <span class="article-tag">Kanker Batang</span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- CTA Strip -->
+        <div class="inner-cta-strip">
+            <div>
+                <h3><i class="fas fa-stethoscope" style="color:#f0d050;margin-right:8px;"></i> Tanaman Anda menunjukkan gejala?</h3>
+                <p>Jangan tunda — lakukan diagnosis sekarang dan dapatkan rekomendasi penanganan yang tepat.</p>
+            </div>
+            <a href="diagnosis.html" class="btn-cta-yellow">
+                <i class="fas fa-arrow-right"></i> Mulai Diagnosis Gratis
+            </a>
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer-new">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-logo" style="margin-bottom:14px;display:inline-flex;">
+                    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                    <span class="logo-text" style="color:white;"><strong>SIPAKAR</strong> KAKAO</span>
+                </a>
+                <p>Sistem Pakar berbasis Case-Based Reasoning untuk membantu petani kakao di Kecamatan Toari mendeteksi dini hama dan penyakit tanaman.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Menu Utama</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="diagnosis.html">Diagnosis Mandiri</a></li>
+                    <li><a href="edukasi.html">Edukasi &amp; Artikel</a></li>
+                    <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Informasi</h4>
+                <ul>
+                    <li><a href="#">Tentang Sistem</a></li>
+                    <li><a href="#">Panduan Penggunaan</a></li>
+                    <li><a href="auth.html">Login Admin</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Kontak</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kecamatan Toari, Kolaka Barat</li>
+                    <li><i class="fas fa-envelope"></i> info@sipakarkakao.id</li>
+                    <li><i class="fas fa-phone"></i> +62 xxx-xxxx-xxxx</li>
+                </ul>
             </div>
         </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Sistem CBR Kakao - Kec. Toari</p>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIPAKAR KAKAO – Sistem Pakar CBR Kec. Toari. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 
+    <!-- MODAL -->
     <div id="edu-modal" class="modal hidden">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <div id="modal-body-content">
-            </div>
+            <div class="modal-close-btn" onclick="closeModal()"><i class="fas fa-times"></i></div>
+            <div id="modal-body-content"></div>
         </div>
     </div>
 
+    <script>
+        // Navbar scroll
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+        // Hamburger
+        const hbg = document.getElementById('hamburger');
+        const nls = document.getElementById('navLinks');
+        if (hbg) hbg.addEventListener('click', () => nls.classList.toggle('open'));
+
+        // Category filter
+        function filterCat(btn, cat) {
+            document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.article-card').forEach(card => {
+                card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'grid' : 'none';
+            });
+        }
+
+        // Close modal on backdrop click
+        window.onclick = e => {
+            const m = document.getElementById('edu-modal');
+            if (e.target === m) closeModal();
+        };
+
+        // Scroll-reveal for article cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.article-card');
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity    = '1';
+                            entry.target.style.transform  = 'translateY(0)';
+                        }, i * 100);
+                        obs.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            cards.forEach(c => {
+                c.style.opacity    = '0';
+                c.style.transform  = 'translateY(24px)';
+                c.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                obs.observe(c);
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="script_landing.js"></script>
 </body>
-
 </html>

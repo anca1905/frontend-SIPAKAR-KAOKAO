@@ -1,98 +1,559 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Riwayat Diagnosis - Sistem CBR Kakao</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Riwayat Diagnosis – SIPAKAR KAKAO</title>
+    <meta name="description" content="Lihat data sebaran dan riwayat diagnosis penyakit dan hama kakao petani di Kecamatan Toari.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        /* page-hero, body bg, hidden, content-header are in landing.css */
+
+
+        /* ===== MINI STATS ===== */
+        .riwayat-mini-stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 28px;
+        }
+        .mini-stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+            flex: 1;
+            min-width: 160px;
+        }
+        .mini-stat-icon {
+            width: 44px; height: 44px;
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .mini-stat-icon.green { background: #e8f5e9; color: #2E7D32; }
+        .mini-stat-icon.yellow { background: #fff8e1; color: #c8a400; }
+        .mini-stat-icon.blue   { background: #e3f2fd; color: #1565C0; }
+        .mini-stat-val { font-size: 1.5rem; font-weight: 800; color: #1a1a1a; line-height: 1; }
+        .mini-stat-label { font-size: 0.78rem; color: #888; margin-top: 3px; }
+
+        /* ===== CONTENT WRAPPER ===== */
+        .riwayat-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 24px 90px;
+        }
+
+        .data-fresh-badge {
+            display: flex; align-items: center; gap: 6px;
+            background: #e8f5e9; color: #2E7D32;
+            font-size: 0.8rem; font-weight: 600;
+            padding: 6px 16px; border-radius: 50px;
+            border: 1px solid #c8e6c9;
+        }
+        .data-fresh-dot { width: 8px; height: 8px; background: #2E7D32; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
+
+        /* ===== FILTER BOX ===== */
+        .filter-box {
+            background: white;
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
+            border: 1px solid #eee;
+        }
+        .filter-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .filter-title i { color: #2E7D32; }
+        .filter-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+        .f-group { flex: 1; min-width: 140px; }
+        .f-group label {
+            display: block;
+            font-size: 0.78rem;
+            color: #777;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .f-group input, .f-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+            background: #fafafa;
+            transition: border-color 0.2s, background 0.2s;
+            color: #333;
+        }
+        .f-group input:focus, .f-group select:focus {
+            border-color: #2E7D32;
+            background: white;
+        }
+        .btn-area { display: flex; gap: 10px; align-items: flex-end; }
+        .btn-filter {
+            padding: 10px 22px;
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            color: white;
+            border: none; border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.875rem; font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.2s;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-filter:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-filter-reset {
+            padding: 10px 18px;
+            background: #f0f0f0;
+            color: #555;
+            border: none; border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.875rem; font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .btn-filter-reset:hover { background: #e0e0e0; }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            border: 1px solid #eee;
+        }
+        .table-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .table-toolbar-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #333;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .table-toolbar-title i { color: #2E7D32; }
+        .table-search {
+            padding: 8px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 0.83rem;
+            font-family: inherit;
+            outline: none;
+            width: 220px;
+            transition: border-color 0.2s;
+        }
+        .table-search:focus { border-color: #2E7D32; }
+
+        .public-table { width: 100%; border-collapse: collapse; }
+        .public-table th {
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            color: white;
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+        .public-table td {
+            padding: 13px 18px;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 0.875rem;
+            color: #444;
+            vertical-align: middle;
+        }
+        .public-table tr:last-child td { border-bottom: none; }
+        .public-table tbody tr:hover td { background: #f7faf7; }
+        .badge-hasil {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #e8f5e9;
+            color: #1B5E20;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            border: 1px solid #c8e6c9;
+        }
+        .badge-score {
+            display: inline-block;
+            background: linear-gradient(135deg, #1565C0, #1976D2);
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 50px;
+            min-width: 60px;
+            text-align: center;
+        }
+        .no-num-col { width: 50px; text-align: center; }
+
+        #no-data-msg {
+            padding: 60px 24px;
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        #no-data-msg i { font-size: 2.5rem; display: block; margin-bottom: 12px; color: #ddd; }
+        .text-center { text-align: center; }
+        .hidden { display: none; }
+
+        /* ===== INFO BANNER ===== */
+        .info-banner {
+            background: linear-gradient(135deg, rgba(27,94,32,0.06), rgba(46,125,50,0.04));
+            border: 1px solid #c8e6c9;
+            border-radius: 12px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            font-size: 0.85rem;
+            color: #2E7D32;
+        }
+        .info-banner i { font-size: 1.1rem; flex-shrink: 0; }
+
+        /* inner-cta-strip and btn-cta-yellow are in landing.css */
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .riwayat-mini-stats { gap: 12px; }
+            .mini-stat-card { min-width: 130px; }
+            .table-search { width: 100%; }
+            .riwayat-cta-strip { flex-direction: column; text-align: center; padding: 28px 24px; }
+            .public-table th, .public-table td { padding: 10px 12px; font-size: 0.8rem; }
+        }
+    </style>
 </head>
+<body class="inner-page">
 
-<body>
-
-    <nav class="navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <span style="color:#2E7D32; font-weight:800;">SISTEM CBR</span> KAKAO
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html#hero">Beranda</a></li>
-                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
-                <li><a href="edukasi.html">Edukasi</a></li>
-                <li><a href="riwayat.html">Riwayat</a></li>
-                <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <span class="logo-text"><strong>SIPAKAR</strong> KAKAO</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link">Beranda</a></li>
+                <li><a href="diagnosis.html" class="nav-link">Diagnosis</a></li>
+                <li><a href="edukasi.html" class="nav-link">Edukasi</a></li>
+                <li><a href="riwayat.html" class="nav-link active">Riwayat</a></li>
             </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-nav-login"><i class="fas fa-user-shield"></i> Login Admin</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <header class="hero small-hero" style="min-height: 250px; height: 35vh;">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <h1>Data Sebaran & Riwayat</h1>
-            <p>Lihat hasil diagnosis petani lain di Kecamatan Toari.</p>
-        </div>
-    </header>
+    <!-- ===== PAGE HERO ===== -->
+    <div class="page-hero">
+        <div class="section-label"><i class="fas fa-history"></i> &nbsp;Data Riwayat</div>
+        <h1>Sebaran &amp; Riwayat Diagnosis</h1>
+        <p>Pantau hasil diagnosis petani di Kecamatan Toari. Data terbuka untuk monitoring penyebaran hama &amp; penyakit secara real-time.</p>
+    </div>
 
-    <section id="riwayat-area" class="section-padding bg-light" style="padding-top: 50px;">
-        <div class="container">
-            <div class="filter-box">
-                <div class="filter-header">
-                    <i class="fas fa-filter"></i> Filter Data
-                </div>
-                <div class="filter-inputs">
-                    <div class="f-group">
-                        <label>Tanggal Mulai</label>
-                        <input type="date" id="filter-start">
-                    </div>
-                    <div class="f-group">
-                        <label>Tanggal Akhir</label>
-                        <input type="date" id="filter-end">
-                    </div>
-                    <div class="f-group">
-                        <label>Penyakit</label>
-                        <select id="filter-penyakit">
-                            <option value="all">Semua Penyakit</option>
-                            <option value="Busuk Buah">Busuk Buah</option>
-                            <option value="Jamur Upas">Jamur Upas</option>
-                            <option value="Kanker Batang">Kanker Batang</option>
-                            <option value="Penggerek Buah">Penggerek Buah</option>
-                        </select>
-                    </div>
-                    <div class="f-group btn-area">
-                        <button onclick="applyFilter()" class="btn-filter">Terapkan</button>
-                        <button onclick="resetFilter()" class="btn-reset">Reset</button>
-                    </div>
+    <!-- ===== CONTENT ===== -->
+    <div class="riwayat-wrapper">
+
+        <!-- Mini Stats -->
+        <div class="riwayat-mini-stats">
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon green"><i class="fas fa-clipboard-list"></i></div>
+                <div>
+                    <div class="mini-stat-val" id="stat-total">—</div>
+                    <div class="mini-stat-label">Total Riwayat</div>
                 </div>
             </div>
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon yellow"><i class="fas fa-calendar-day"></i></div>
+                <div>
+                    <div class="mini-stat-val" id="stat-bulan">—</div>
+                    <div class="mini-stat-label">Bulan Ini</div>
+                </div>
+            </div>
+            <div class="mini-stat-card">
+                <div class="mini-stat-icon blue"><i class="fas fa-map-marker-alt"></i></div>
+                <div>
+                    <div class="mini-stat-val" id="stat-lokasi">—</div>
+                    <div class="mini-stat-label">Lokasi Tercatat</div>
+                </div>
+            </div>
+        </div>
 
-            <div class="table-container">
+        <!-- Info Banner -->
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            <span>Data ini bersifat publik dan digunakan untuk keperluan monitoring penyebaran hama &amp; penyakit kakao di Kecamatan Toari.</span>
+        </div>
+
+        <!-- Header -->
+        <div class="content-header">
+            <div class="content-header-left">
+                <h2>Data Riwayat Diagnosis</h2>
+                <p>Hasil diagnosis yang telah dilakukan oleh petani</p>
+            </div>
+            <div class="data-fresh-badge">
+                <div class="data-fresh-dot"></div>
+                Data Terbaru
+            </div>
+        </div>
+
+        <!-- Filter Box -->
+        <div class="filter-box">
+            <div class="filter-title"><i class="fas fa-sliders-h"></i> Filter &amp; Pencarian</div>
+            <div class="filter-inputs">
+                <div class="f-group">
+                    <label>Tanggal Mulai</label>
+                    <input type="date" id="filter-start">
+                </div>
+                <div class="f-group">
+                    <label>Tanggal Akhir</label>
+                    <input type="date" id="filter-end">
+                </div>
+                <div class="f-group">
+                    <label>Penyakit / Hama</label>
+                    <select id="filter-penyakit">
+                        <option value="all">Semua Penyakit</option>
+                        <option value="Busuk Buah">Busuk Buah</option>
+                        <option value="Jamur Upas">Jamur Upas</option>
+                        <option value="Kanker Batang">Kanker Batang</option>
+                        <option value="Penggerek Buah">Penggerek Buah</option>
+                    </select>
+                </div>
+                <div class="f-group btn-area">
+                    <button onclick="applyFilter()" class="btn-filter">
+                        <i class="fas fa-search"></i> Terapkan
+                    </button>
+                    <button onclick="resetFilter()" class="btn-filter-reset">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <div class="table-toolbar">
+                <div class="table-toolbar-title">
+                    <i class="fas fa-table"></i>
+                    Daftar Riwayat Diagnosis
+                </div>
+                <input type="text" class="table-search" id="tableSearch" placeholder="🔍  Cari nama / lokasi..." oninput="searchTable(this.value)">
+            </div>
+            <div style="overflow-x:auto;">
                 <table class="public-table">
                     <thead>
                         <tr>
+                            <th class="no-num-col">No</th>
                             <th>Tanggal</th>
                             <th>Nama Petani</th>
-                            <th>Lokasi</th>
+                            <th>Lokasi Kebun</th>
                             <th>Hasil Diagnosis</th>
-                            <th>Tingkat Kemiripan</th>
+                            <th style="text-align:center">Tingkat Kemiripan</th>
                         </tr>
                     </thead>
-                    <tbody id="history-body">
-                    </tbody>
+                    <tbody id="history-body"></tbody>
                 </table>
-                <p id="no-data-msg" class="hidden text-center">Data tidak ditemukan.</p>
+            </div>
+            <p id="no-data-msg" class="hidden text-center">
+                <i class="fas fa-inbox"></i>
+                Tidak ada data yang ditemukan.
+            </p>
+        </div>
+
+        <!-- CTA Strip -->
+        <div class="inner-cta-strip">
+            <div>
+                <h3><i class="fas fa-stethoscope" style="color:#f0d050;margin-right:8px;"></i> Belum pernah melakukan diagnosis?</h3>
+                <p>Coba sekarang — gratis, tidak perlu login, dan hasilnya langsung tersimpan di sini.</p>
+            </div>
+            <a href="diagnosis.html" class="btn-cta-yellow">
+                <i class="fas fa-arrow-right"></i> Mulai Diagnosis Gratis
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-new">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-logo" style="margin-bottom:14px; display:inline-flex;">
+                    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                    <span class="logo-text" style="color:white;"><strong>SIPAKAR</strong> KAKAO</span>
+                </a>
+                <p>Sistem Pakar berbasis Case-Based Reasoning untuk membantu petani kakao di Kecamatan Toari mendeteksi dini hama dan penyakit tanaman.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Menu Utama</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="diagnosis.html">Diagnosis Mandiri</a></li>
+                    <li><a href="edukasi.html">Edukasi &amp; Artikel</a></li>
+                    <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Informasi</h4>
+                <ul>
+                    <li><a href="#">Tentang Sistem</a></li>
+                    <li><a href="#">Panduan Penggunaan</a></li>
+                    <li><a href="auth.html">Login Admin</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Kontak</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kecamatan Toari, Kolaka Barat</li>
+                    <li><i class="fas fa-envelope"></i> info@sipakarkakao.id</li>
+                    <li><i class="fas fa-phone"></i> +62 xxx-xxxx-xxxx</li>
+                </ul>
             </div>
         </div>
-    </section>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Sistem CBR Kakao - Kec. Toari</p>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIPAKAR KAKAO – Sistem Pakar CBR Kec. Toari. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 
-    <script src="script_landing.js"></script>
-</body>
+    <script>
+        // Navbar scroll
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
 
+        // Hamburger
+        const hbg = document.getElementById('hamburger');
+        const nls = document.getElementById('navLinks');
+        if (hbg) hbg.addEventListener('click', () => nls.classList.toggle('open'));
+
+        // Live table search (client-side)
+        function searchTable(query) {
+            const rows = document.querySelectorAll('#history-body tr');
+            const q = query.toLowerCase().trim();
+            let found = 0;
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const show = !q || text.includes(q);
+                row.style.display = show ? '' : 'none';
+                if (show) found++;
+            });
+            const noData = document.getElementById('no-data-msg');
+            if (noData) noData.classList.toggle('hidden', found > 0);
+        }
+
+        // Update mini stats after data loads
+        function updateMiniStats(data) {
+            document.getElementById('stat-total').textContent = data.length;
+            const thisMonth = new Date().toISOString().slice(0, 7);
+            const bulanIni = data.filter(d => d.tgl && d.tgl.startsWith(thisMonth)).length;
+            document.getElementById('stat-bulan').textContent = bulanIni;
+            const lokasiSet = new Set(data.map(d => d.lokasi).filter(Boolean));
+            document.getElementById('stat-lokasi').textContent = lokasiSet.size || '—';
+        }
+
+        // Override renderHistoryTable to use new badge styles
+        window._origRender = window.renderHistoryTable;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Patch renderHistoryTable after script_landing.js loads
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="script_landing.js"></script>
+    <script>
+        // Patch renderHistoryTable to use new badge styles + update stats
+        const _origLoadRiwayat = loadRiwayatPublic;
+        async function loadRiwayatPublic() {
+            try {
+                const response = await fetch('api/api_riwayat.php');
+                riwayatData = await response.json();
+                updateMiniStats(riwayatData);
+                renderHistoryTableNew(riwayatData);
+            } catch (err) {
+                console.error("Riwayat fetch error:", err);
+            }
+        }
+
+        function renderHistoryTableNew(data) {
+            const tbody = document.getElementById('history-body');
+            const noData = document.getElementById('no-data-msg');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            if (!data || data.length === 0) {
+                if (noData) noData.classList.remove('hidden');
+                return;
+            }
+            if (noData) noData.classList.add('hidden');
+            data.forEach((item, i) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="text-align:center;color:#bbb;font-size:0.8rem;">${i + 1}</td>
+                        <td><span style="color:#555;font-size:0.82rem;">${item.tgl || '—'}</span></td>
+                        <td><strong style="color:#222;">${item.nama || 'Petani Umum'}</strong></td>
+                        <td><span style="color:#666;font-size:0.85rem;"><i class="fas fa-map-marker-alt" style="color:#2E7D32;margin-right:4px;font-size:0.75rem;"></i>${item.lokasi || '—'}</span></td>
+                        <td><span class="badge-hasil"><i class="fas fa-leaf"></i>${item.hasil || '—'}</span></td>
+                        <td style="text-align:center;"><span class="badge-score">${item.nilai || '—'}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function applyFilter() {
+            const startDate = document.getElementById('filter-start').value;
+            const endDate   = document.getElementById('filter-end').value;
+            const penyakit  = document.getElementById('filter-penyakit').value;
+            let filtered = riwayatData.filter(item => {
+                let ok = true;
+                if (startDate && item.tgl < startDate) ok = false;
+                if (endDate   && item.tgl > endDate)   ok = false;
+                if (penyakit !== 'all' && item.hasil !== penyakit) ok = false;
+                return ok;
+            });
+            renderHistoryTableNew(filtered);
+        }
+
+        function resetFilter() {
+            document.getElementById('filter-start').value    = '';
+            document.getElementById('filter-end').value      = '';
+            document.getElementById('filter-penyakit').value = 'all';
+            document.getElementById('tableSearch').value     = '';
+            renderHistoryTableNew(riwayatData);
+        }
+    </script>
+</body>
 </html>

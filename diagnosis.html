@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnosis Mandiri – SIPAKAR KAKAO</title>
+    <meta name="description" content="Lakukan diagnosis mandiri penyakit dan hama tanaman kakao Anda secara cepat dan akurat menggunakan sistem CBR.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        /* ── Diagnosis-specific styles only ── */
+        .diag-wrapper {
+            max-width: 900px;
+            margin: -32px auto 0;
+            padding: 0 24px 80px;
+        }
+        .diag-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.10);
+            border: 1px solid #eee;
+        }
+        .diag-card > h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1B5E20;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .diag-card > p {
+            font-size: 0.88rem;
+            color: #888;
+            margin-bottom: 24px;
+        }
+
+        /* Gejala checkbox grid */
+        .gejala-grid-public {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 8px;
+            margin-bottom: 28px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 2px 4px 2px 2px;
+        }
+        .gejala-cyber-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 11px 14px;
+            background: #f7f9f4;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.18s, border-color 0.18s;
+        }
+        .gejala-cyber-card:hover  { background: #e8f5e9; border-color: #2E7D32; }
+        .gejala-cyber-card.checked { background: #e8f5e9; border-color: #2E7D32; }
+        .gejala-cyber-card input  { accent-color: #2E7D32; width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+        .gejala-cyber-label { font-size: 0.85rem; line-height: 1.45; cursor: pointer; }
+
+        /* Input row */
+        .input-row { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+        .input-field {
+            flex: 1;
+            min-width: 180px;
+            padding: 12px 16px;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            outline: none;
+            background: #fafafa;
+        }
+        .input-field:focus { border-color: #2E7D32; background: white; }
+
+        /* Submit button */
+        .btn-diagnose {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 6px 20px rgba(46,125,50,0.3);
+        }
+        .btn-diagnose:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(46,125,50,0.4); }
+        .btn-diagnose:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* Result box */
+        .result-box {
+            margin-top: 28px;
+            background: linear-gradient(135deg, #f0f9f0, #fafdf8);
+            border: 2px solid #2E7D32;
+            border-radius: 16px;
+            padding: 28px;
+        }
+        .result-header-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #c8e6c9;
+        }
+        .result-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+        }
+        .result-header-bar h3  { font-size: 1rem; font-weight: 700; color: #1B5E20; margin: 0; }
+        .result-header-bar p   { font-size: 0.8rem; color: #888; margin: 0; }
+        #res-penyakit { font-size: 1.7rem; font-weight: 800; color: #1B5E20; margin-bottom: 10px; }
+        .badge-score {
+            display: inline-block;
+            background: #2E7D32;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        .calc-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 16px; border-radius: 10px; overflow: hidden; }
+        .calc-table th { background: #1B5E20; color: white; padding: 10px 14px; text-align: left; font-weight: 600; }
+        .calc-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; background: white; }
+        .calc-table tr:last-child td { border-bottom: none; }
+        .solution-box-new {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-top: 16px;
+            border-left: 4px solid #c8a400;
+        }
+        .solution-box-new strong { font-size: 0.9rem; color: #333; }
+        #res-solusi { margin-top: 8px; font-size: 0.9rem; line-height: 1.75; color: #444; }
+        .btn-reset-diag {
+            margin-top: 16px;
+            padding: 9px 22px;
+            background: #eee;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .btn-reset-diag:hover { background: #ddd; }
+        .btn-sm { padding: 8px 18px; background: #eee; border: none; border-radius: 8px; font-family: inherit; font-size: 0.87rem; cursor: pointer; }
+    </style>
+</head>
+<body class="inner-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <span class="logo-text"><strong>SIPAKAR</strong> KAKAO</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html"     class="nav-link">Beranda</a></li>
+                <li><a href="diagnosis.html" class="nav-link active">Diagnosis</a></li>
+                <li><a href="edukasi.html"   class="nav-link">Edukasi</a></li>
+                <li><a href="riwayat.html"   class="nav-link">Riwayat</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-nav-login"><i class="fas fa-user-shield"></i> Login Admin</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HERO -->
+    <div class="page-hero">
+        <div class="section-label"><i class="fas fa-stethoscope"></i>&nbsp; Alat Diagnosis</div>
+        <h1>Form Diagnosis Mandiri</h1>
+        <p>Pilih gejala yang terlihat pada tanaman kakao Anda. Sistem akan menganalisis dan memberikan hasil diagnosis secara otomatis.</p>
+    </div>
+
+    <!-- FORM DIAGNOSIS -->
+    <div class="diag-wrapper" id="diagnosis-area">
+        <div class="diag-card">
+            <h2><i class="fas fa-clipboard-check"></i> Pilih Gejala Tanaman</h2>
+            <p>Centang semua gejala yang Anda amati pada tanaman kakao Anda.</p>
+
+            <form id="public-diagnosis-form" onsubmit="handlePublicDiagnosis(event)">
+                <div class="gejala-grid-public" id="public-gejala-list"></div>
+
+                <div class="input-row">
+                    <input type="text" id="petani-name"  placeholder="Nama Petani (Opsional)"              class="input-field">
+                    <input type="text" id="lokasi-kebun" placeholder="Lokasi Kebun (Cth: Desa Toari)"       class="input-field">
+                </div>
+
+                <button type="submit" class="btn-diagnose">
+                    <i class="fas fa-search"></i> Analisis Kondisi Tanaman
+                </button>
+            </form>
+
+            <!-- Hasil -->
+            <div id="diagnosis-result" class="result-box hidden">
+                <div class="result-header-bar">
+                    <div class="result-icon"><i class="fas fa-notes-medical"></i></div>
+                    <div>
+                        <h3>Hasil Analisis Sistem</h3>
+                        <p>Berdasarkan Case-Based Reasoning (CBR)</p>
+                    </div>
+                </div>
+                <!-- Info Petani & Gejala Terpilih -->
+                <div id="res-info-panel" style="margin-bottom:20px; padding:16px 18px; background:#f7faf7; border:1px solid #c8e6c9; border-radius:12px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; margin-bottom:14px;">
+                        <div>
+                            <p style="font-size:0.75rem; color:#888; margin-bottom:2px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;"><i class="fas fa-user" style="margin-right:5px;"></i>Nama Petani</p>
+                            <p id="res-nama" style="font-size:0.95rem; font-weight:700; color:#1B5E20; margin:0;">-</p>
+                        </div>
+                        <div>
+                            <p style="font-size:0.75rem; color:#888; margin-bottom:2px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;"><i class="fas fa-map-marker-alt" style="margin-right:5px;"></i>Lokasi Kebun</p>
+                            <p id="res-lokasi" style="font-size:0.95rem; font-weight:700; color:#1B5E20; margin:0;">-</p>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="font-size:0.75rem; color:#888; margin-bottom:8px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;"><i class="fas fa-list-check" style="margin-right:5px;"></i>Gejala yang Dipilih (<span id="res-gejala-count">0</span> gejala)</p>
+                        <div id="res-gejala-tags" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+                    </div>
+                </div>
+
+                <h2 id="res-penyakit">-</h2>
+                <p style="margin-bottom:6px;">Tingkat Kemiripan: <span id="res-nilai" class="badge-score">0%</span></p>
+                <p style="font-size:0.84rem;color:#888;">Kasus Referensi: <strong id="res-kasus-ref">-</strong></p>
+
+                <!-- Kalimat Kesimpulan -->
+                <div id="res-summary" style="margin-top:16px; padding:14px 18px; background:#f0f9f0; border-left:4px solid #2E7D32; border-radius:10px; font-size:0.9rem; line-height:1.7; color:#333;">
+                    <i class="fas fa-file-alt" style="color:#2E7D32; margin-right:8px;"></i>
+                    <span id="res-summary-text">-</span>
+                </div>
+
+                <div style="margin-top:20px;border-top:1px dashed #c8e6c9;padding-top:16px;">
+                    <h4 style="font-size:0.88rem;color:#555;margin-bottom:10px;font-weight:700;">Rincian Kandidat Penyakit:</h4>
+                    <table class="calc-table">
+                        <thead>
+                            <tr>
+                                <th>Nama Penyakit</th>
+                                <th>Kasus Referensi</th>
+                                <th style="text-align:center">Nilai Jarak City Block</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-list"></tbody>
+                    </table>
+                </div>
+
+                <div class="solution-box-new">
+                    <strong><i class="fas fa-lightbulb" style="color:#c8a400;margin-right:6px;"></i> Rekomendasi Penanganan:</strong>
+                    <p id="res-solusi">-</p>
+                </div>
+
+                <button onclick="resetDiagnosis()" class="btn-reset-diag">
+                    <i class="fas fa-redo"></i> Reset / Diagnosis Ulang
+                </button>
+            </div>
+        </div>
+
+        <!-- CTA Strip -->
+        <div class="inner-cta-strip">
+            <div>
+                <h3><i class="fas fa-book-open" style="color:#f0d050;margin-right:8px;"></i> Ingin tahu lebih banyak?</h3>
+                <p>Baca artikel edukasi kami tentang cara menangani hama &amp; penyakit kakao secara tepat.</p>
+            </div>
+            <a href="edukasi.html" class="btn-cta-yellow">
+                <i class="fas fa-arrow-right"></i> Buka Pusat Edukasi
+            </a>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer-new">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-logo" style="margin-bottom:14px;display:inline-flex;">
+                    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                    <span class="logo-text" style="color:white;"><strong>SIPAKAR</strong> KAKAO</span>
+                </a>
+                <p>Sistem Pakar berbasis Case-Based Reasoning untuk membantu petani kakao di Kecamatan Toari mendeteksi dini hama dan penyakit tanaman.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Menu Utama</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="diagnosis.html">Diagnosis Mandiri</a></li>
+                    <li><a href="edukasi.html">Edukasi &amp; Artikel</a></li>
+                    <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Informasi</h4>
+                <ul>
+                    <li><a href="#">Tentang Sistem</a></li>
+                    <li><a href="#">Panduan Penggunaan</a></li>
+                    <li><a href="auth.html">Login Admin</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-col">
+                <h4>Kontak</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kecamatan Toari, Kolaka Barat</li>
+                    <li><i class="fas fa-envelope"></i> info@sipakarkakao.id</li>
+                    <li><i class="fas fa-phone"></i> +62 xxx-xxxx-xxxx</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIPAKAR KAKAO – Sistem Pakar CBR Kec. Toari. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script>
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+        const hbg = document.getElementById('hamburger');
+        const nls = document.getElementById('navLinks');
+        if (hbg) hbg.addEventListener('click', () => nls.classList.toggle('open'));
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="script_landing.js"></script>
+</body>
+</html>

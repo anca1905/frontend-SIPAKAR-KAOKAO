@@ -91,12 +91,15 @@ while ($row = $res_kasus->fetch_assoc()) {
 
     // 4. RANKING & SELEKSI KASUS TERBAIK
     //    Simpan hasil perhitungan kemiripan ke dalam array ranking.
+    //    Gunakan Manhattan Distance (City Block) sebagai ukuran kemiripan:
+    //    Semakin KECIL nilai distance, semakin MIRIP kasus tersebut.
     if ($similarity > 0) {
-        // Jika kasus dengan penyakit yang sama sudah ada di daftar, kita hanya menyimpan kasus yang memiliki persentase tertinggi (terbaik)
-        if (!isset($final_ranking[$kode_p]) || $similarity > $final_ranking[$kode_p]['persen']) {
+        // Jika kasus dengan penyakit yang sama sudah ada di daftar, simpan hanya yang distance-nya terkecil (paling mirip)
+        if (!isset($final_ranking[$kode_p]) || $distance < $final_ranking[$kode_p]['distance']) {
             $final_ranking[$kode_p] = [
                 'nama'      => $nama_p,
                 'kasus_ref' => $nama_k,
+                'distance'  => $distance,
                 'persen'    => round($similarity, 2),
                 'solusi'    => $solusi_p
             ];
@@ -116,9 +119,10 @@ if (empty($final_ranking)) {
     exit;
 }
 
-// Urutkan seluruh penyakit dari persentase kemiripan (Similarity) yang paling tinggi ke rendah.
+// Urutkan seluruh penyakit dari nilai Manhattan Distance (City Block) terkecil ke terbesar.
+// Nilai distance terkecil = paling mirip dengan gejala user.
 uasort($final_ranking, function ($a, $b) {
-    return $b['persen'] <=> $a['persen'];
+    return $a['distance'] <=> $b['distance'];
 });
 
 // Ambil peringkat teratas (penyakit dengan nilai Similarity tertinggi) sebagai hasil akhir diagnosis.
@@ -134,7 +138,7 @@ $pemenang      = $final_ranking[$kode_terpilih];
 // untuk dimasukkan kembali sebagai kasus baru di masa mendatang guna memperkaya basis kasus.
 $tgl       = date('Y-m-d');
 $hasil_txt = $pemenang['nama'];
-$nilai_txt = $pemenang['persen'] . '%';
+$nilai_txt = 'Jarak: ' . $pemenang['distance'];
 
 $stmt = $conn->prepare("INSERT INTO riwayat (tanggal, nama_petani, lokasi, hasil_diagnosis, nilai_cf) VALUES (?, ?, ?, ?, ?)");
 $stmt->bind_param("sssss", $tgl, $nama_petani, $lokasi, $hasil_txt, $nilai_txt);
@@ -145,6 +149,7 @@ echo json_encode([
     'status'             => 'success',
     'penyakit'           => $pemenang['nama'],
     'nilai'              => $pemenang['persen'],
+    'distance'           => $pemenang['distance'],
     'solusi'             => $pemenang['solusi'],
     'kasus_referensi'    => $pemenang['kasus_ref'],
     'detail_perhitungan' => array_values($final_ranking)

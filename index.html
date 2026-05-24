@@ -1,120 +1,406 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem CBR Kakao - Diagnosis & Riwayat</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>SIPAKAR KAKAO – Sistem Pakar Diagnosis Hama & Penyakit Kakao</title>
+    <meta name="description" content="Sistem Pakar CBR untuk mendeteksi dini hama dan penyakit tanaman kakao secara mandiri. Didukung teknologi kecerdasan buatan untuk petani Kec. Toari.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
 </head>
-
 <body>
 
-    <nav class="navbar">
-        <div class="container nav-container">
-            <div class="logo">
-                <span style="color:#2E7D32; font-weight:800;">SISTEM CBR</span> KAKAO
-            </div>
-            <ul class="nav-links">
-                <li><a href="index.html#hero">Beranda</a></li>
-                <li><a href="index.html#diagnosis-area">Diagnosis</a></li>
-                <li><a href="edukasi.html">Edukasi</a></li>
-                <li><a href="riwayat.html">Riwayat</a></li>
-                <li><a href="auth.html" class="btn-login"><i class="fas fa-user-shield"></i> Login Admin</a></li>
+    <!-- ===== NAVBAR ===== -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <span class="logo-text"><strong>SIPAKAR</strong> KAKAO</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html" class="nav-link active">Beranda</a></li>
+                <li><a href="diagnosis.html" class="nav-link">Diagnosis</a></li>
+                <li><a href="edukasi.html" class="nav-link">Edukasi</a></li>
+                <li><a href="riwayat.html" class="nav-link">Riwayat</a></li>
             </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-nav-login"><i class="fas fa-user-shield"></i> Login Admin</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <header id="hero" class="hero small-hero">
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero-section" id="hero">
+        <div class="hero-bg-img" style="background-image: url('assets/cocoa_hero_farmer.png');"></div>
         <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <h1>Deteksi Dini Penyakit Kakao</h1>
-            <p>Lakukan diagnosis mandiri, pelajari hama penyakit, dan pantau kesehatan kebun di Kecamatan Toari.</p>
-            <button onclick="scrollToDiagnosis()" class="btn-primary">Mulai Diagnosis</button>
-        </div>
-    </header>
-
-    <section id="diagnosis-area" class="section-padding">
-        <div class="container">
-            <div class="section-title">
-                <h2>Form Diagnosis Mandiri</h2>
-                <p>Silahkan centang gejala penyakit/hama yang terlihat pada tanaman kakao Anda.</p>
+        <div class="hero-container">
+            <!-- Left content -->
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="badge-dot"></span>
+                    Teknologi Pertanian Kakao
+                </div>
+                <h1 class="hero-title">Deteksi Dini <br>Penyakit &amp; Hama<br><span class="hero-highlight">Kakao Anda.</span></h1>
+                <p class="hero-desc">Sistem pakar berbasis CBR membantu petani mendiagnosis kondisi tanaman kakao secara mandiri, cepat, dan akurat.</p>
+                <div class="hero-actions">
+                    <a href="diagnosis.html" class="btn-hero-primary">
+                        Mulai Diagnosis <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="edukasi.html" class="btn-hero-outline">
+                        <i class="fas fa-book-open"></i> Pelajari Lebih Lanjut
+                    </a>
+                </div>
+                <!-- <div class="hero-social-proof">
+                    <div class="proof-avatars">
+                        <img src="https://i.pravatar.cc/32?img=1" alt="p1">
+                        <img src="https://i.pravatar.cc/32?img=2" alt="p2">
+                        <img src="https://i.pravatar.cc/32?img=3" alt="p3">
+                        <img src="https://i.pravatar.cc/32?img=4" alt="p4">
+                        <img src="https://i.pravatar.cc/32?img=5" alt="p5">
+                    </div>
+                    <div class="proof-text">
+                        <span class="proof-stars">★★★★★</span>
+                        <p><strong>4.9+</strong> dari 500+ petani yang telah menggunakan sistem ini</p>
+                    </div>
+                </div> -->
             </div>
-
-            <div class="diagnosis-card">
-                <form id="public-diagnosis-form" onsubmit="handlePublicDiagnosis(event)">
-                    <div class="gejala-grid-public" id="public-gejala-list">
+            <!-- Right: farmer image -->
+            <div class="hero-image-wrap">
+                <div class="hero-image-circle"></div>
+                <img src="assets/cocoa_hero_farmer.png" alt="Petani Kakao" class="hero-farmer-img">
+                <div class="hero-float-card hero-float-top">
+                    <i class="fas fa-seedling"></i>
+                    <div>
+                        <strong>Deteksi Akurat</strong>
+                        <span>Berbasis CBR AI</span>
                     </div>
-
-                    <div class="diagnosis-action">
-                        <div class="input-grid-details">
-                            <input type="text" id="petani-name" placeholder="Nama Lengkap" class="input-field" required>
-                            <input type="text" id="lokasi-kebun" placeholder="Alamat / Lokasi Kebun" class="input-field" required>
-                        </div>
-                        <button type="submit" class="btn-primary btn-block">Cek Kondisi Tanaman</button>
+                </div>
+                <div class="hero-float-card hero-float-bottom">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <strong>1.200+ Kasus</strong>
+                        <span>Data Tersimpan</span>
                     </div>
-                </form>
+                </div>
+            </div>
+        </div>
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator">
+            <div class="scroll-dot"></div>
+        </div>
+    </section>
 
-                <div id="diagnosis-result" class="result-card-new hidden">
-                    <div class="result-card-header">
-                        <h2>Hasil Diagnosa</h2>
+    <!-- ===== STATS STRIP ===== -->
+    <section class="stats-strip">
+        <div class="stats-inner">
+            <div class="stat-item">
+                <span class="stat-num" data-target="500">0</span><span class="stat-suffix">+</span>
+                <p>Petani Terbantu</p>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-num" data-target="12">0</span><span class="stat-suffix"></span>
+                <p>Jenis Penyakit / Hama</p>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-num" data-target="1200">0</span><span class="stat-suffix">+</span>
+                <p>Kasus Diagnosis</p>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-num" data-target="95">0</span><span class="stat-suffix">%</span>
+                <p>Tingkat Akurasi</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== ABOUT / INDUSTRY SECTION (like reference) ===== -->
+    <section class="about-section" id="tentang">
+        <div class="about-container">
+            <div class="about-image-col">
+                <div class="about-img-wrap">
+                    <img src="assets/cocoa_plantation_field.png" alt="Perkebunan Kakao" class="about-main-img">
+                    <!-- <div class="about-img-overlay-card">
+                        <i class="fas fa-chart-line"></i>
+                        <div>
+                            <strong>5K+</strong>
+                            <span>Hektar Kebun Terpantau</span>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+            <div class="about-content-col">
+                <div class="section-label">TENTANG SISTEM KAMI</div>
+                <h2 class="section-title">Dengan keahlian pertanian <br>+ teknologi, kami membantu <br>petani tumbuh lebih cerdas.</h2>
+                <p class="section-desc">Misi kami sederhana: mendukung petani kakao dengan alat inovatif, metode berkelanjutan, dan bimbingan ahli agar setiap musim panen bisa lebih baik dari sebelumnya.</p>
+                <div class="about-features">
+                    <div class="about-feature-item">
+                        <div class="feature-icon-sm"><i class="fas fa-microscope"></i></div>
+                        <div>
+                            <h4>Diagnosis Berbasis AI</h4>
+                            <p>Teknologi CBR yang mencocokkan gejala dengan basis pengetahuan pakar.</p>
+                        </div>
                     </div>
-                    <div class="result-card-content">
-                        <div class="result-section">
-                            <h3 class="section-subtitle">Identitas Pemilik :</h3>
-                            <div class="identity-info">
-                                <p>Nama : <span id="res-nama-petani">-</span></p>
-                                <p>Alamat : <span id="res-alamat-petani">-</span></p>
-                            </div>
-                        </div>
-
-                        <div class="result-section">
-                            <h3 class="section-subtitle">Gejala yang diinputkan oleh pemilik :</h3>
-                            <ol class="selected-gejala-list" id="res-gejala-list">
-                                <!-- List gejala akan diisi via JS -->
-                            </ol>
-                        </div>
-
-                        <div class="result-section">
-                            <h3 class="section-subtitle">Persentase Setiap Penyakit :</h3>
-                            <ul class="disease-percentage-list" id="res-all-percentages">
-                                <!-- List persentase semua penyakit -->
-                            </ul>
-                        </div>
-
-                        <div class="result-section">
-                            <h3 class="section-subtitle">Hasil Diagnosa :</h3>
-                            <p class="diagnosis-summary" id="res-summary-text">
-                                Dilihat dari hasil persentase setiap penyakit yang tertera, tanaman cokelat anda terjangkit <span id="res-penyakit-name" style="font-weight: bold;">-</span> sebesar <span id="res-penyakit-percent" style="font-weight: bold;">0%</span>
-                            </p>
-                        </div>
-
-                        <div class="result-section">
-                            <h3 class="section-subtitle">Solusi Pengobatan :</h3>
-                            <div class="solution-content" id="res-solusi-list">
-                                <!-- List solusi -->
-                            </div>
-                        </div>
-
-                        <div class="result-footer-actions">
-                            <button onclick="window.print()" class="btn-print"><i class="fas fa-print"></i> Cetak Hasil</button>
-                            <button onclick="resetDiagnosis()" class="btn-secondary">Diagnosis Ulang</button>
+                    <div class="about-feature-item">
+                        <div class="feature-icon-sm"><i class="fas fa-database"></i></div>
+                        <div>
+                            <h4>Basis Data Kasus Nyata</h4>
+                            <p>Dilatih dari ribuan kasus hama dan penyakit di lapangan secara nyata.</p>
                         </div>
                     </div>
+                    <div class="about-feature-item">
+                        <div class="feature-icon-sm"><i class="fas fa-book-reader"></i></div>
+                        <div>
+                            <h4>Pusat Edukasi Petani</h4>
+                            <p>Artikel panduan, solusi penanganan, dan informasi terkini untuk petani.</p>
+                        </div>
+                    </div>
+                </div>
+                <a href="diagnosis.html" class="btn-see-more">Lihat Lebih Lanjut <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FITUR UNGGULAN ===== -->
+    <section class="features-section" id="fitur">
+        <div class="features-container">
+            <div class="features-header">
+                <div class="section-label">FITUR UNGGULAN</div>
+                <h2 class="section-title-center">Semua yang Anda butuhkan<br>dalam satu platform</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card-new">
+                    <div class="feature-card-icon" style="background: linear-gradient(135deg,#1B5E20,#2E7D32);">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <h3>Diagnosis Mandiri</h3>
+                    <p>Centang gejala yang terlihat pada tanaman, dan sistem akan menganalisis penyakit atau hama yang menyerang secara otomatis.</p>
+                    <a href="diagnosis.html" class="card-link">Mulai Diagnosis <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="feature-card-new featured">
+                    <div class="feature-card-icon" style="background: linear-gradient(135deg,#c8a400,#e6c200);">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="feat-badge-popular">Paling Populer</div>
+                    <h3>AI Case-Based Reasoning</h3>
+                    <p>Mesin inferensi yang bekerja seperti seorang pakar – membandingkan kasus baru dengan ribuan kasus yang sudah terdokumentasi.</p>
+                    <a href="diagnosis.html" class="card-link">Coba Sekarang <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="feature-card-new">
+                    <div class="feature-card-icon" style="background: linear-gradient(135deg,#1565C0,#1976D2);">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>Edukasi &amp; Artikel</h3>
+                    <p>Konten panduan lengkap tentang penanganan hama, penyakit, dan praktik terbaik budidaya kakao dari para ahli.</p>
+                    <a href="edukasi.html" class="card-link">Baca Artikel <i class="fas fa-chevron-right"></i></a>
+                </div>
+                <div class="feature-card-new">
+                    <div class="feature-card-icon" style="background: linear-gradient(135deg,#6A1B9A,#8E24AA);">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Riwayat Diagnosis</h3>
+                    <p>Pantau tren penyebaran hama dan penyakit di wilayah Kecamatan Toari melalui data riwayat diagnosis komunitas.</p>
+                    <a href="riwayat.html" class="card-link">Lihat Riwayat <i class="fas fa-chevron-right"></i></a>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Sistem CBR Kakao - Kec. Toari</p>
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="howto-section" id="cara-kerja">
+        <div class="howto-container">
+            <div class="features-header">
+                <div class="section-label">CARA KERJA</div>
+                <h2 class="section-title-center">Diagnosis hanya dalam <span style="color:#c8a400">3 langkah mudah</span></h2>
+            </div>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Pilih Gejala</h3>
+                    <p>Amati tanaman Anda dan centang semua gejala yang terlihat pada formulir diagnosis kami.</p>
+                </div>
+                <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                    <h3>Proses AI</h3>
+                    <p>Sistem CBR kami menganalisis gejala dan mencocokkan dengan basis data kasus penyakit kakao.</p>
+                </div>
+                <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="fas fa-file-medical-alt"></i></div>
+                    <h3>Hasil &amp; Solusi</h3>
+                    <p>Dapatkan hasil diagnosis lengkap beserta rekomendasi penanganan yang tepat sasaran.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TEAM / FARMER SECTION ===== -->
+    <!-- <section class="team-section" id="tim">
+        <div class="team-container">
+            <div class="team-header">
+                <div class="section-label">TIM &amp; INOVASI</div>
+                <h2 class="section-title-center">Didukung oleh para ahli<br>&amp; pakar pertanian</h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-card">
+                    <div class="team-img-wrap">
+                        <img src="assets/cocoa_tech_farmer.png" alt="Petani Kakao" class="team-img">
+                        <div class="team-overlay">
+                            <a href="diagnosis.html" class="team-cta"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h4>Petani Lokal</h4>
+                        <span>Mitra Kebun Kec. Toari</span>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&q=80" alt="Pakar Agronomi" class="team-img">
+                        <div class="team-overlay">
+                            <a href="edukasi.html" class="team-cta"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h4>Pakar Agronomi</h4>
+                        <span>Konsultan Penyakit Tanaman</span>
+                    </div>
+                </div>
+                <div class="team-card">
+                    <div class="team-img-wrap">
+                        <img src="https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?w=300&q=80" alt="Peneliti CBR" class="team-img">
+                        <div class="team-overlay">
+                            <a href="riwayat.html" class="team-cta"><i class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h4>Peneliti Sistem Pakar</h4>
+                        <span>Pengembang CBR Engine</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- ===== TESTIMONI ===== -->
+    <!-- <section class="testi-section" id="testimoni">
+        <div class="testi-container">
+            <div class="features-header">
+                <div class="section-label">TESTIMONI</div>
+                <h2 class="section-title-center">Apa kata petani<br>yang sudah mencoba?</h2>
+            </div>
+            <div class="testi-grid">
+                <div class="testi-card">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"Sistem ini sangat membantu. Saya bisa tahu tanaman saya kena busuk buah sebelum menyebar ke pohon lain. Solusinya juga lengkap!"</p>
+                    <div class="testi-author">
+                        <img src="https://i.pravatar.cc/40?img=10" alt="Pak Rustam">
+                        <div>
+                            <strong>Pak Rustam</strong>
+                            <span>Petani Kakao, Desa Toari</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card testi-featured">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"Mudah digunakan, tinggal centang gejala, langsung keluar hasilnya. Saya sudah pakai berkali-kali dan hasilnya selalu tepat."</p>
+                    <div class="testi-author">
+                        <img src="https://i.pravatar.cc/40?img=20" alt="Ibu Marlina">
+                        <div>
+                            <strong>Ibu Marlina</strong>
+                            <span>Petani Kakao, Desa Watunohu</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testi-card">
+                    <div class="testi-stars">★★★★★</div>
+                    <p>"Sebelumnya saya harus tunggu petugas BPP, sekarang bisa diagnosis sendiri kapan saja. Sistem ini benar-benar inovatif untuk petani kami."</p>
+                    <div class="testi-author">
+                        <img src="https://i.pravatar.cc/40?img=30" alt="Pak Hendra">
+                        <div>
+                            <strong>Pak Hendra</strong>
+                            <span>Petani Kakao, Desa Pelambua</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="cta-section">
+        <div class="cta-bg" style="background-image: url('assets/cocoa_stats_bg.png');"></div>
+        <div class="cta-overlay"></div>
+        <div class="cta-content">
+            <div class="section-label" style="color:rgba(255,255,255,0.7)">MULAI SEKARANG</div>
+            <h2>Siap mendiagnosis tanaman kakao Anda?</h2>
+            <p>Gratis, cepat, dan akurat. Tidak perlu daftar untuk memulai diagnosis.</p>
+            <div class="cta-actions">
+                <a href="diagnosis.html" class="btn-cta-primary">
+                    <i class="fas fa-stethoscope"></i> Mulai Diagnosis Gratis
+                </a>
+                <!-- <a href="edukasi.html" class="btn-cta-outline">
+                    <i class="fas fa-book"></i> Baca Panduan
+                </a> -->
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-new">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="nav-logo" style="margin-bottom:12px;">
+                    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                    <span class="logo-text" style="color:white;"><strong>SIPAKAR</strong> KAKAO</span>
+                </div>
+                <p>Sistem Pakar berbasis Case-Based Reasoning untuk membantu petani kakao di Kecamatan Toari mendeteksi dini hama dan penyakit tanaman.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Menu Utama</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="diagnosis.html">Diagnosis Mandiri</a></li>
+                    <li><a href="edukasi.html">Edukasi &amp; Artikel</a></li>
+                    <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
+                </ul>
+            </div>
+            <!-- <div class="footer-links-col">
+                <h4>Informasi</h4>
+                <ul>
+                    <li><a href="#">Tentang Sistem</a></li>
+                    <li><a href="#">Panduan Penggunaan</a></li>
+                    <li><a href="auth.html">Login Admin</a></li>
+                </ul>
+            </div> -->
+            <div class="footer-links-col">
+                <h4>Kontak</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kecamatan Toari, Kolaka Barat</li>
+                    <li><i class="fas fa-envelope"></i> info@sipakarkakao.id</li>
+                    <li><i class="fas fa-phone"></i> +62 xxx-xxxx-xxxx</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIPAKAR KAKAO – Sistem Pakar CBR Kec. Toari. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 
-    <script src="script_landing.js"></script>
+    <script src="landing.js"></script>
 </body>
-
 </html>

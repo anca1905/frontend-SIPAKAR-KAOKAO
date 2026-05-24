@@ -1,14 +1,7 @@
+// Tab switching ditangani oleh switchTab() di auth.html
+// switchForm() dipertahankan sebagai alias untuk kompatibilitas
 function switchForm(target) {
-    const loginBox = document.getElementById('login-box');
-    const registerBox = document.getElementById('register-box');
-
-    if (target === 'register') {
-        loginBox.classList.add('hidden');
-        registerBox.classList.remove('hidden');
-    } else {
-        registerBox.classList.add('hidden');
-        loginBox.classList.remove('hidden');
-    }
+    if (typeof switchTab === 'function') switchTab(target);
 }
 
 async function handleLogin(e) {
@@ -18,6 +11,16 @@ async function handleLogin(e) {
     const pass = document.getElementById('login-pass').value;
 
     if (user && pass) {
+        // Tampilkan loading state agar user tahu proses sedang berjalan
+        Swal.fire({
+            title: 'Memproses Login...',
+            html: 'Mohon tunggu sebentar.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         const formData = new FormData();
         formData.append('username', user);
         formData.append('password', pass);
@@ -29,16 +32,44 @@ async function handleLogin(e) {
             if(result.status === 'success') {
                 localStorage.setItem('adminToken', result.token);
                 localStorage.setItem('adminNama', result.nama);
-                alert(`Login Berhasil! Selamat datang, ${result.nama}`);
-                window.location.href = 'dashboard.html';
+                
+                // Alert berhasil yang keren dengan auto-close dan progress bar
+                Swal.fire({
+                    title: 'Login Berhasil!',
+                    text: `Selamat datang kembali, ${result.nama}!`,
+                    icon: 'success',
+                    iconColor: '#2E7D32',
+                    confirmButtonColor: '#2E7D32',
+                    timer: 2000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = 'dashboard.html';
+                });
             } else {
-                alert(result.message);
+                Swal.fire({
+                    title: 'Login Gagal',
+                    text: result.message,
+                    icon: 'error',
+                    confirmButtonColor: '#2E7D32'
+                });
             }
         } catch(err) {
-            alert('Gagal menghubungi server');
+            Swal.fire({
+                title: 'Kesalahan Koneksi',
+                text: 'Gagal menghubungi server. Periksa koneksi internet Anda.',
+                icon: 'error',
+                confirmButtonColor: '#2E7D32'
+            });
         }
     } else {
-        alert("Mohon isi username dan password!");
+        Swal.fire({
+            title: 'Form Belum Lengkap',
+            text: 'Mohon isi username dan password!',
+            icon: 'warning',
+            confirmButtonColor: '#2E7D32',
+            iconColor: '#c8a400'
+        });
     }
 }
 
@@ -49,6 +80,15 @@ async function handleRegister(e) {
     const pass = document.getElementById('reg-pass').value;
 
     if (name && user && pass) {
+        Swal.fire({
+            title: 'Mendaftarkan Akun...',
+            html: 'Mohon tunggu sebentar.',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         const formData = new FormData();
         formData.append('nama', name);
         formData.append('username', user);
@@ -59,16 +99,34 @@ async function handleRegister(e) {
             const result = await resp.json();
 
             if(result.status === 'success') {
-                alert("Pendaftaran Berhasil! Silahkan Login.");
-                document.getElementById('reg-name').value = '';
-                document.getElementById('reg-user').value = '';
-                document.getElementById('reg-pass').value = '';
-                switchForm('login');
+                Swal.fire({
+                    title: 'Pendaftaran Berhasil!',
+                    text: 'Akun Anda telah berhasil dibuat. Silakan login.',
+                    icon: 'success',
+                    iconColor: '#2E7D32',
+                    confirmButtonColor: '#2E7D32'
+                }).then(() => {
+                    document.getElementById('reg-name').value = '';
+                    document.getElementById('reg-user').value = '';
+                    document.getElementById('reg-pass').value = '';
+                    switchForm('login');
+                });
             } else {
-                alert(result.message);
+                Swal.fire({
+                    title: 'Pendaftaran Gagal',
+                    text: result.message,
+                    icon: 'error',
+                    confirmButtonColor: '#2E7D32'
+                });
             }
         } catch(err) {
-            alert('Gagal mendaftar, periksa koneksi');
+            Swal.fire({
+                title: 'Kesalahan Koneksi',
+                text: 'Gagal mendaftar, periksa koneksi internet Anda.',
+                icon: 'error',
+                confirmButtonColor: '#2E7D32'
+            });
         }
     }
 }
+

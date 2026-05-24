@@ -206,7 +206,7 @@ footer {
 }
 
 .auth-body {
-    background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop');
+    background-image: url('assets/background.png');
     background-size: cover;
     background-position: center;
     height: 100vh;
@@ -1400,4 +1400,4 @@ footer {
         box-shadow: none;
     }
     .container { width: 100%; max-width: none; }
-}
+}
