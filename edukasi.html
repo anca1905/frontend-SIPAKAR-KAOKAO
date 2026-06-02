@@ -364,6 +364,11 @@
                             </div>
                         </article>`;
                 });
+                
+                // Animate in
+                setTimeout(() => {
+                    container.querySelectorAll('.article-card').forEach(c => {
+                        c.style.opacity = '1'; c.style.transform = 'translateY(0)';
                     });
                 }, 50);
 
