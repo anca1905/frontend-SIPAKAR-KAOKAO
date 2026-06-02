@@ -7,6 +7,8 @@
     <title>Login - Sistem CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="auth-body">
@@ -68,6 +70,20 @@
         </div>
     </div>
 
+    <script>
+        // Fungsi toggle antara box login & register
+        function switchTab(target) {
+            const loginBox    = document.getElementById('login-box');
+            const registerBox = document.getElementById('register-box');
+            if (target === 'register') {
+                loginBox.classList.add('hidden');
+                registerBox.classList.remove('hidden');
+            } else {
+                registerBox.classList.add('hidden');
+                loginBox.classList.remove('hidden');
+            }
+        }
+    </script>
     <script src="auth.js"></script>
 </body>
 

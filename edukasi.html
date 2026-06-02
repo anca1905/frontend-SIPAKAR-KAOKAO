@@ -245,76 +245,14 @@
             <span class="article-count-badge"><i class="fas fa-newspaper"></i>&nbsp; 3 Artikel</span>
         </div>
 
-        <!-- Filter tabs -->
-        <div class="cat-tabs">
-            <button class="cat-tab active"  onclick="filterCat(this,'all')">Semua</button>
-            <button class="cat-tab penyakit" onclick="filterCat(this,'penyakit')"><i class="fas fa-bacterium"></i> Penyakit</button>
-            <button class="cat-tab hama"     onclick="filterCat(this,'hama')"><i class="fas fa-bug"></i> Hama</button>
+        <!-- Filter tabs – populated dynamically from DB -->
+        <div class="cat-tabs" id="cat-tabs-container">
+            <button class="cat-tab active" onclick="filterDynamic(this,'')">Semua</button>
         </div>
 
         <!-- Article list -->
         <div class="article-list" id="articleList">
-
-            <article class="article-card" data-cat="penyakit">
-                <div class="article-image">
-                    <img src="https://distan.bulelengkab.go.id/uploads/konten/88_mengatasi-busuk-buah-pada-tanaman-kakao.jpg" alt="Busuk Buah Kakao">
-                    <span class="category-badge penyakit"><i class="fas fa-bacterium"></i> Penyakit</span>
-                </div>
-                <div class="article-content">
-                    <div class="article-meta">
-                        <span><i class="far fa-calendar-alt"></i> 12 Mei 2025</span>
-                        <span><i class="far fa-user"></i> Admin BPP Toari</span>
-                        <span><i class="far fa-clock"></i> 4 menit baca</span>
-                    </div>
-                    <h3><a href="#" onclick="openModal('busuk-buah'); return false;">Waspada Penyakit Busuk Buah (Phytophthora) di Musim Hujan</a></h3>
-                    <p class="article-excerpt">Penyakit busuk buah kakao merupakan salah satu ancaman terbesar bagi petani. Penyakit ini disebabkan oleh jamur <em>Phytophthora palmivora</em> yang berkembang pesat saat kelembapan tinggi dan hujan intens di musim penghujan.</p>
-                    <div class="article-footer-row">
-                        <a href="#" class="read-more" onclick="openModal('busuk-buah'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
-                        <span class="article-tag">Phytophthora</span>
-                    </div>
-                </div>
-            </article>
-
-            <article class="article-card" data-cat="hama">
-                <div class="article-image">
-                    <img src="https://gokomodo.com/_next/image?url=https%3A%2F%2Fgkmdblog.s3.ap-southeast-1.amazonaws.com%2Fwp-content%2Fuploads%2F2023%2F10%2F13180428%2FBlog-Hama-Tanaman.jpg&w=1080&q=75" alt="Hama PBK">
-                    <span class="category-badge hama"><i class="fas fa-bug"></i> Hama</span>
-                </div>
-                <div class="article-content">
-                    <div class="article-meta">
-                        <span><i class="far fa-calendar-alt"></i> 10 Mei 2025</span>
-                        <span><i class="far fa-user"></i> Admin BPP Toari</span>
-                        <span><i class="far fa-clock"></i> 5 menit baca</span>
-                    </div>
-                    <h3><a href="#" onclick="openModal('pbk'); return false;">Teknik Sarungisasi untuk Mencegah Hama Penggerek Buah (PBK)</a></h3>
-                    <p class="article-excerpt">Hama Penggerek Buah Kakao (PBK) seringkali merusak biji dari dalam buah tanpa terlihat dari luar. Salah satu metode pengendalian yang paling efektif dan ramah lingkungan adalah teknik penyelubungan buah muda.</p>
-                    <div class="article-footer-row">
-                        <a href="#" class="read-more" onclick="openModal('pbk'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
-                        <span class="article-tag">Conopomorpha cramerella</span>
-                    </div>
-                </div>
-            </article>
-
-            <article class="article-card" data-cat="penyakit">
-                <div class="article-image">
-                    <img src="https://balittri.litbang.pertanian.go.id/images/kankerbatang.jpg" alt="Kanker Batang Kakao">
-                    <span class="category-badge penyakit"><i class="fas fa-bacterium"></i> Penyakit</span>
-                </div>
-                <div class="article-content">
-                    <div class="article-meta">
-                        <span><i class="far fa-calendar-alt"></i> 05 Mei 2025</span>
-                        <span><i class="far fa-user"></i> Pakar Kakao</span>
-                        <span><i class="far fa-clock"></i> 4 menit baca</span>
-                    </div>
-                    <h3><a href="#" onclick="openModal('kanker'); return false;">Mengenal Gejala Kanker Batang dan Cara Pengupasannya</a></h3>
-                    <p class="article-excerpt">Jika batang kakao Anda mengeluarkan cairan merah seperti karat, waspadalah. Itu adalah tanda kanker batang yang bisa mematikan pohon jika tidak segera ditangani dengan teknik pengupasan kulit yang benar dan tepat waktu.</p>
-                    <div class="article-footer-row">
-                        <a href="#" class="read-more" onclick="openModal('kanker'); return false;">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
-                        <span class="article-tag">Kanker Batang</span>
-                    </div>
-                </div>
-            </article>
-
+            <div style="text-align:center;padding:40px;color:#aaa;"><i class="fas fa-spinner fa-spin" style="font-size:2rem"></i></div>
         </div>
 
         <!-- CTA Strip -->
@@ -354,14 +292,7 @@
                     <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
                 </ul>
             </div>
-            <div class="footer-links-col">
-                <h4>Informasi</h4>
-                <ul>
-                    <li><a href="#">Tentang Sistem</a></li>
-                    <li><a href="#">Panduan Penggunaan</a></li>
-                    <li><a href="auth.html">Login Admin</a></li>
-                </ul>
-            </div>
+
             <div class="footer-links-col">
                 <h4>Kontak</h4>
                 <ul>
@@ -376,14 +307,6 @@
         </div>
     </footer>
 
-    <!-- MODAL -->
-    <div id="edu-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-close-btn" onclick="closeModal()"><i class="fas fa-times"></i></div>
-            <div id="modal-body-content"></div>
-        </div>
-    </div>
-
     <script>
         // Navbar scroll
         const nav = document.getElementById('mainNav');
@@ -394,41 +317,88 @@
         const nls = document.getElementById('navLinks');
         if (hbg) hbg.addEventListener('click', () => nls.classList.toggle('open'));
 
-        // Category filter
-        function filterCat(btn, cat) {
-            document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.querySelectorAll('.article-card').forEach(card => {
-                card.style.display = (cat === 'all' || card.dataset.cat === cat) ? 'grid' : 'none';
-            });
+        /* ── Dynamic artikel loader ── */
+        async function loadArtikelPublik(katSlug = '') {
+            const container = document.getElementById('articleList');
+            container.innerHTML = '<div style="text-align:center;padding:50px;color:#aaa;grid-column:1/-1"><i class="fas fa-spinner fa-spin" style="font-size:2rem"></i></div>';
+            try {
+                let url = 'api/api_artikel.php?action=read_artikel';
+                if (katSlug) url += '&kategori=' + katSlug;
+                const r    = await fetch(url);
+                const data = await r.json();
+
+                const badge = document.querySelector('.article-count-badge');
+                if (badge) badge.innerHTML = `<i class="fas fa-newspaper"></i>&nbsp; ${data.length} Artikel`;
+
+                if (!data.length) {
+                    container.innerHTML = '<div style="text-align:center;padding:60px;color:#aaa;grid-column:1/-1"><i class="fas fa-newspaper" style="font-size:3rem;display:block;margin-bottom:12px"></i>Belum ada artikel tersedia.</div>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.forEach((a, i) => {
+                    const tgl = a.tanggal ? new Date(a.tanggal).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) : '';
+                    const imgHtml = a.gambar_url
+                        ? `<img src="${a.gambar_url}" alt="${a.judul}" loading="lazy">`
+                        : `<div style="width:100%;height:100%;min-height:220px;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;"><i class="fas fa-seedling" style="font-size:3rem;color:#2E7D32"></i></div>`;
+                    const badgeClass = a.warna === 'hama' ? 'hama' : (a.warna === 'lainnya' ? '' : 'penyakit');
+                    const badgeIcon  = a.warna === 'hama' ? 'fa-bug' : 'fa-bacterium';
+                    const katBadge   = a.nama_kategori
+                        ? `<span class="category-badge ${badgeClass}"><i class="fas ${badgeIcon}"></i> ${a.nama_kategori}</span>` : '';
+
+                    container.innerHTML += `
+                        <article class="article-card" data-cat="${a.slug_kategori||''}" style="opacity:0;transform:translateY(24px);transition:opacity .5s ease ${i*0.1}s,transform .5s ease ${i*0.1}s;">
+                            <div class="article-image">${imgHtml}${katBadge}</div>
+                            <div class="article-content">
+                                <div class="article-meta">
+                                    ${tgl ? `<span><i class="far fa-calendar-alt"></i> ${tgl}</span>` : ''}
+                                    ${a.penulis ? `<span><i class="far fa-user"></i> ${a.penulis}</span>` : ''}
+                                    <span><i class="far fa-clock"></i> ${a.waktu_baca||4} menit baca</span>
+                                </div>
+                                <h3><a href="artikel.html?id=${a.id}">${a.judul}</a></h3>
+                                <p class="article-excerpt">${a.excerpt||''}</p>
+                                <div class="article-footer-row">
+                                    <a href="artikel.html?id=${a.id}" class="read-more">Baca Selengkapnya <i class="fas fa-arrow-right"></i></a>
+                                    ${a.nama_kategori ? `<span class="article-tag">${a.nama_kategori}</span>` : ''}
+                                </div>
+                            </div>
+                        </article>`;
+                });
+                    });
+                }, 50);
+
+            } catch(err) {
+                console.error(err);
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:#e53935;"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:12px;display:block"></i>Gagal memuat artikel dari server.</div>';
+            }
         }
 
-        // Close modal on backdrop click
-        window.onclick = e => {
-            const m = document.getElementById('edu-modal');
-            if (e.target === m) closeModal();
-        };
-
-        // Scroll-reveal for article cards
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.article-card');
-            const obs = new IntersectionObserver(entries => {
-                entries.forEach((entry, i) => {
-                    if (entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity    = '1';
-                            entry.target.style.transform  = 'translateY(0)';
-                        }, i * 100);
-                        obs.unobserve(entry.target);
-                    }
+        // Override filterCat to work with dynamic data
+        let allKatPublik = [];
+        async function loadKatFilter() {
+            try {
+                const r = await fetch('api/api_artikel.php?action=read_kategori');
+                allKatPublik = await r.json();
+                const tabs = document.querySelector('.cat-tabs');
+                // Clear existing hardcoded tabs and rebuild dynamically
+                tabs.innerHTML = `<button class="cat-tab active" onclick="filterDynamic(this,'')" data-kat="">Semua</button>`;
+                allKatPublik.forEach(k => {
+                    const icon = k.warna === 'hama' ? 'fa-bug' : (k.warna === 'lainnya' ? 'fa-leaf' : 'fa-bacterium');
+                    tabs.innerHTML += `<button class="cat-tab ${k.warna}" onclick="filterDynamic(this,'${k.slug}')" data-kat="${k.slug}"><i class="fas ${icon}"></i> ${k.nama}</button>`;
                 });
-            }, { threshold: 0.1 });
-            cards.forEach(c => {
-                c.style.opacity    = '0';
-                c.style.transform  = 'translateY(24px)';
-                c.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                obs.observe(c);
-            });
+            } catch(e) { console.error(e); }
+        }
+
+        function filterDynamic(btn, katSlug) {
+            document.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            loadArtikelPublik(katSlug);
+        }
+
+        // Init on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadKatFilter();
+            loadArtikelPublik();
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

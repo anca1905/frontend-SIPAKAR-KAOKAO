@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artikel – SIPAKAR KAKAO</title>
+    <meta name="description" content="Baca artikel lengkap seputar hama dan penyakit tanaman kakao.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="landing.css">
+    <style>
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 120px 24px 80px;
+        }
+        .article-hero-img {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .article-title {
+            font-size: 2.2rem;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .article-meta {
+            display: flex;
+            gap: 20px;
+            color: #666;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            flex-wrap: wrap;
+        }
+        .article-meta span {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .article-meta i {
+            color: #2E7D32;
+        }
+        .article-body {
+            font-size: 1.1rem;
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+        .solution-box {
+            background: #e8f5e9;
+            padding: 30px;
+            border-radius: 16px;
+            border-left: 6px solid #2E7D32;
+        }
+        .solution-box h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        .solution-box p {
+            line-height: 1.7;
+            color: #333;
+        }
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #f5f5f5;
+            color: #333;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 30px;
+        }
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+        .not-found {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .not-found h2 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="inner-page">
+
+    <!-- NAVBAR -->
+    <nav class="navbar" id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <span class="logo-text"><strong>SIPAKAR</strong> KAKAO</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html"     class="nav-link">Beranda</a></li>
+                <li><a href="diagnosis.html" class="nav-link">Diagnosis</a></li>
+                <li><a href="edukasi.html"   class="nav-link active">Edukasi</a></li>
+                <li><a href="riwayat.html"   class="nav-link">Riwayat</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="auth.html" class="btn-nav-login"><i class="fas fa-user-shield"></i> Login Admin</a>
+                <button class="hamburger" id="hamburger" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="article-container" id="article-content">
+        <!-- Content will be injected here via JS -->
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer-new">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-logo" style="margin-bottom:14px;display:inline-flex;">
+                    <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                    <span class="logo-text" style="color:white;"><strong>SIPAKAR</strong> KAKAO</span>
+                </a>
+                <p>Sistem Pakar berbasis Case-Based Reasoning untuk membantu petani kakao di Kecamatan Toari mendeteksi dini hama dan penyakit tanaman.</p>
+                <div class="footer-socials">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-links-col">
+                <h4>Menu Utama</h4>
+                <ul>
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="diagnosis.html">Diagnosis Mandiri</a></li>
+                    <li><a href="edukasi.html">Edukasi &amp; Artikel</a></li>
+                    <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h4>Kontak</h4>
+                <ul>
+                    <li><i class="fas fa-map-marker-alt"></i> Kecamatan Toari, Kolaka Barat</li>
+                    <li><i class="fas fa-envelope"></i> info@sipakarkakao.id</li>
+                    <li><i class="fas fa-phone"></i> +62 xxx-xxxx-xxxx</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SIPAKAR KAKAO – Sistem Pakar CBR Kec. Toari. Hak Cipta Dilindungi.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Navbar scroll
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40));
+
+        // Hamburger
+        const hbg = document.getElementById('hamburger');
+        const nls = document.getElementById('navLinks');
+        if (hbg) hbg.addEventListener('click', () => nls.classList.toggle('open'));
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params    = new URLSearchParams(window.location.search);
+            const articleId = params.get('id');   // now numeric DB id
+            const container = document.getElementById('article-content');
+
+            if (!articleId) {
+                container.innerHTML = `<div class="not-found"><h2>Artikel Tidak Ditemukan</h2><p>ID artikel tidak valid.</p><br><a href="edukasi.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Edukasi</a></div>`;
+                return;
+            }
+
+            container.innerHTML = `<div style="text-align:center;padding:100px 20px;color:#aaa;"><i class="fas fa-spinner fa-spin" style="font-size:2.5rem"></i></div>`;
+
+            try {
+                const r    = await fetch('api/api_artikel.php?action=read_artikel&id=' + articleId);
+                const data = await r.json();
+
+                if (!data || !data.id) {
+                    container.innerHTML = `<div class="not-found"><h2>Artikel Tidak Ditemukan</h2><p>Maaf, artikel tidak tersedia.</p><br><a href="edukasi.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Edukasi</a></div>`;
+                    return;
+                }
+
+                document.title = data.judul + ' – SIPAKAR KAKAO';
+
+                const tgl = data.tanggal ? new Date(data.tanggal).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) : '';
+
+                const protokolHtml = data.protokol
+                    ? `<div class="solution-box"><h3><i class="fas fa-check-circle"></i> Protokol Pengendalian:</h3><p>${data.protokol.replace(/\n/g,'<br>')}</p></div>`
+                    : '';
+
+                const imgHtml = data.gambar_url
+                    ? `<img src="${data.gambar_url}" alt="${data.judul}" class="article-hero-img">`
+                    : '';
+
+                container.innerHTML = `
+                    <a href="edukasi.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali ke Edukasi</a>
+                    <h1 class="article-title">${data.judul}</h1>
+                    <div class="article-meta">
+                        ${tgl ? `<span><i class="far fa-calendar-alt"></i> ${tgl}</span>` : ''}
+                        ${data.penulis ? `<span><i class="far fa-user"></i> ${data.penulis}</span>` : ''}
+                        <span><i class="far fa-clock"></i> ${data.waktu_baca||4} menit baca</span>
+                        ${data.nama_kategori ? `<span><i class="fas fa-tag"></i> ${data.nama_kategori}</span>` : ''}
+                    </div>
+                    ${imgHtml}
+                    <div class="article-body">${data.isi ? data.isi.replace(/\n/g,'<br>') : data.excerpt || ''}</div>
+                    ${protokolHtml}
+                `;
+            } catch(err) {
+                console.error(err);
+                container.innerHTML = `<div class="not-found"><h2>Gagal Memuat Artikel</h2><p>Terjadi kesalahan. Coba lagi nanti.</p><br><a href="edukasi.html" class="back-btn"><i class="fas fa-arrow-left"></i> Kembali</a></div>`;
+            }
+        });
+    </script>
+</body>
+</html>

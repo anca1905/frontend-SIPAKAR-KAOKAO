@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ---- Animated number counter (stats strip) ----
-    function animateCounter(el, target, suffix, duration) {
+    function animateCounter(el, target, duration) {
         let start = 0;
         const step = Math.ceil(target / (duration / 16));
         const timer = setInterval(() => {
@@ -42,21 +42,72 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 16);
     }
 
-    // Use IntersectionObserver to trigger counters when visible
-    const statNums = document.querySelectorAll('.stat-num');
-    if (statNums.length) {
+    // Setup IntersectionObserver untuk memulai animasi counter saat terlihat
+    function initCounterObserver() {
+        const statNums = document.querySelectorAll('.stat-num');
+        if (!statNums.length) return;
+
         const counterObserver = new IntersectionObserver((entries, obs) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const el     = entry.target;
                     const target = parseInt(el.getAttribute('data-target'), 10);
-                    animateCounter(el, target, '', 1500);
+                    animateCounter(el, target, 1500);
                     obs.unobserve(el);
                 }
             });
         }, { threshold: 0.5 });
         statNums.forEach(el => counterObserver.observe(el));
     }
+
+    // Fetch statistik dinamis dari database, lalu mulai counter
+    async function loadLandingStats() {
+        try {
+            const res  = await fetch('api/api_statistik_landing.php');
+            const data = await res.json();
+
+            if (data.status === 'ok') {
+                // Petani Terbantu
+                const elPetani = document.getElementById('stat-petani');
+                if (elPetani && data.petani_terbantu > 0) {
+                    elPetani.setAttribute('data-target', data.petani_terbantu);
+                }
+
+                // Jenis Penyakit / Hama
+                const elPenyakit = document.getElementById('stat-penyakit');
+                if (elPenyakit && data.jenis_penyakit > 0) {
+                    elPenyakit.setAttribute('data-target', data.jenis_penyakit);
+                }
+
+                // Kasus Diagnosis
+                const elKasus = document.getElementById('stat-kasus');
+                if (elKasus && data.kasus_diagnosis > 0) {
+                    elKasus.setAttribute('data-target', data.kasus_diagnosis);
+                }
+
+                // Tingkat Akurasi
+                const elAkurasi = document.getElementById('stat-akurasi');
+                if (elAkurasi && data.tingkat_akurasi > 0) {
+                    elAkurasi.setAttribute('data-target', data.tingkat_akurasi);
+                }
+
+                // Hero float card — kasus tersimpan CBR
+                const elHeroKasus = document.getElementById('hero-kasus-cbr');
+                if (elHeroKasus && data.kasus_tersimpan > 0) {
+                    // Format ribuan dengan titik (misal 1.200)
+                    elHeroKasus.textContent = data.kasus_tersimpan.toLocaleString('id-ID');
+                }
+            }
+        } catch (err) {
+            // Gagal fetch → biarkan nilai default di data-target (tetap statis)
+            console.warn('SIPAKAR: Gagal memuat statistik dari server.', err);
+        } finally {
+            // Selalu mulai animasi, baik API berhasil maupun gagal
+            initCounterObserver();
+        }
+    }
+
+    loadLandingStats();
 
     // ---- Scroll-reveal animation ----
     const revealEls = document.querySelectorAll(

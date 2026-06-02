@@ -260,11 +260,15 @@ async function handlePublicDiagnosis(e) {
                 // Mengisi Tabel Rincian Manhattan Distance
                 if(detailList) {
                     detailList.innerHTML = '';
-                    if (result.detail_perhitungan) {
-                        result.detail_perhitungan.forEach(dp => {
-                            const isWinner = dp.nama === result.penyakit;
+                    const btnLihat = document.getElementById('btn-lihat-lainnya');
+                    const LIMIT    = 4;
+
+                    if (result.detail_perhitungan && result.detail_perhitungan.length > 0) {
+                        result.detail_perhitungan.forEach((dp, idx) => {
+                            const isWinner  = dp.nama === result.penyakit;
+                            const isHidden  = idx >= LIMIT;
                             detailList.innerHTML += `
-                                <tr style="${isWinner ? 'background:#e8f5e9; font-weight:600;' : ''}">
+                                <tr class="${isHidden ? 'row-hidden' : ''}" style="${isWinner ? 'background:#e8f5e9; font-weight:600;' : ''}">
                                     <td style="border: 1px solid #ddd; padding: 8px;">
                                         ${isWinner ? '<i class="fas fa-check-circle" style="color:#2E7D32;margin-right:6px;"></i>' : ''}${dp.nama}
                                     </td>
@@ -275,6 +279,21 @@ async function handlePublicDiagnosis(e) {
                                 </tr>
                             `;
                         });
+
+                        // Tampilkan tombol "Lihat Lainnya" hanya jika total > LIMIT
+                        if (btnLihat) {
+                            if (result.detail_perhitungan.length > LIMIT) {
+                                const sisanya = result.detail_perhitungan.length - LIMIT;
+                                const labelTeks = `Lihat ${sisanya} Lainnya`;
+                                document.getElementById('label-lihat').textContent = labelTeks;
+                                document.getElementById('icon-lihat').className    = 'fas fa-chevron-down';
+                                btnLihat.dataset.labelMore = labelTeks;
+                                btnLihat.dataset.expanded  = 'false';
+                                btnLihat.style.display     = 'flex';
+                            } else {
+                                btnLihat.style.display = 'none';
+                            }
+                        }
                     }
                 }
 
@@ -399,35 +418,37 @@ const eduData = {
     }
 };
 
-function openModal(id) {
-    const data = eduData[id];
-    if (!data) return;
+// Removed modal popup functions (openModal, closeModal) as articles now use their own page (artikel.html)
 
-    const modalBody = document.getElementById('modal-body-content');
-    if (!modalBody) return;
+// ── Toggle kandidat tersembunyi di tabel diagnosis ──
+function toggleKandidatLainnya() {
+    const btn      = document.getElementById('btn-lihat-lainnya');
+    const icon     = document.getElementById('icon-lihat');
+    const label    = document.getElementById('label-lihat');
+    const hiddenRows = document.querySelectorAll('#detail-list .row-hidden, #detail-list tr.row-hidden');
+    const expanded = btn.dataset.expanded === 'true';
 
-    modalBody.innerHTML = `
-        <img src="${data.img}" style="width:100%; border-radius:8px; margin-bottom:15px;" alt="${data.title}">
-        <h2 style="color:#2E7D32; margin-bottom:15px; font-weight:bold;">${data.title}</h2>
-        <p style="margin-bottom:20px; line-height:1.6; color:#555;">${data.desc}</p>
-        <div style="background:#e8f5e9; padding:15px; border-radius:8px; border-left:4px solid #2E7D32;">
-            <strong style="color:#2E7D32;"><i class="fas fa-check-circle"></i> Protokol Pengendalian:</strong>
-            <p style="margin-top:10px; font-size:0.95rem; line-height:1.6; color:#333;">${data.solusi}</p>
-        </div>
-    `;
+    // Hitung jumlah baris tersembunyi
+    const allExtra = document.querySelectorAll('#detail-list tr[class*="row-extra"]').length ||
+                     document.querySelectorAll('#detail-list tr.row-hidden-candidate').length;
 
-    const modal = document.getElementById('edu-modal');
-    if (modal) modal.classList.remove('hidden');
-}
-
-function closeModal() {
-    const modal = document.getElementById('edu-modal');
-    if (modal) modal.classList.add('hidden');
-}
-
-window.onclick = function (event) {
-    const modal = document.getElementById('edu-modal');
-    if (event.target == modal) {
-        closeModal();
+    if (expanded) {
+        // Sembunyikan kembali baris > 4
+        document.querySelectorAll('#detail-list tr').forEach((tr, idx) => {
+            if (idx >= 4) tr.style.display = 'none';
+        });
+        label.textContent = btn.dataset.labelMore || 'Lihat Lainnya';
+        icon.className    = 'fas fa-chevron-down';
+        btn.dataset.expanded = 'false';
+    } else {
+        // Tampilkan semua baris
+        document.querySelectorAll('#detail-list tr').forEach(tr => {
+            tr.style.display = '';
+        });
+        // Hitung baris yang tadinya tersembunyi
+        const totalRows = document.querySelectorAll('#detail-list tr').length;
+        label.textContent = 'Sembunyikan';
+        icon.className    = 'fas fa-chevron-up';
+        btn.dataset.expanded = 'true';
     }
-}
+}

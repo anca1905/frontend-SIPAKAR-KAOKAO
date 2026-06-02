@@ -170,6 +170,29 @@
         }
         .btn-reset-diag:hover { background: #ddd; }
         .btn-sm { padding: 8px 18px; background: #eee; border: none; border-radius: 8px; font-family: inherit; font-size: 0.87rem; cursor: pointer; }
+
+        /* Show-more kandidat */
+        .btn-show-more-kandidat {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            padding: 9px 16px;
+            background: #f0f9f0;
+            border: 1.5px dashed #a5d6a7;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #2E7D32;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-show-more-kandidat:hover { background: #e8f5e9; }
+        .row-hidden { display: none; }
     </style>
 </head>
 <body class="inner-page">
@@ -271,6 +294,11 @@
                         </thead>
                         <tbody id="detail-list"></tbody>
                     </table>
+                    <!-- Tombol lihat lebih / sembunyikan -->
+                    <button id="btn-lihat-lainnya" class="btn-show-more-kandidat" onclick="toggleKandidatLainnya()" style="display:none;">
+                        <i class="fas fa-chevron-down" id="icon-lihat"></i>
+                        <span id="label-lihat">Lihat Lainnya</span>
+                    </button>
                 </div>
 
                 <div class="solution-box-new">
@@ -320,14 +348,7 @@
                     <li><a href="riwayat.html">Riwayat Diagnosis</a></li>
                 </ul>
             </div>
-            <div class="footer-links-col">
-                <h4>Informasi</h4>
-                <ul>
-                    <li><a href="#">Tentang Sistem</a></li>
-                    <li><a href="#">Panduan Penggunaan</a></li>
-                    <li><a href="auth.html">Login Admin</a></li>
-                </ul>
-            </div>
+
             <div class="footer-links-col">
                 <h4>Kontak</h4>
                 <ul>
