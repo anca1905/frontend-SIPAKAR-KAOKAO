@@ -60,34 +60,33 @@ while ($row = $res_kasus->fetch_assoc()) {
 
     if (empty($gejala_kasus)) continue;
 
+    // Cek apakah ada irisan (gejala yang cocok). Jika tidak ada sama sekali, anggap tidak berkaitan dan lewati.
+    $irisan = array_intersect($gejala_kasus, $gejala_user);
+    if (count($irisan) == 0) continue;
+
     // -----------------------------------------------------------------------
     // TAHAP 2 CBR: REUSE - PROSES PERHITUNGAN RUMUS KEMIRIPAN (SIMILARITY)
     // -----------------------------------------------------------------------
-    // Rumus yang digunakan adalah Manhattan Distance yang kemudian dikonversi menjadi persentase Similarity.
+    // Sesuai permintaan: Perhitungan HANYA mengevaluasi gejala yang dimiliki oleh Kasus Lama ini.
+    // Gejala dari penyakit lain yang dipilih user tidak ikut dihitung (tidak menambah penalti jarak).
     
-    // 1. Gabungkan semua gejala unik dari Kasus Lama dan Gejala yang dipilih User saat ini.
-    $gabungan = array_unique(array_merge($gejala_kasus, $gejala_user));
     $distance = 0;
     
-    // 2. Hitung MANHATTAN DISTANCE:
-    //    Rumus Manhattan Distance: d(x, y) = Sigma |x_i - y_i|
-    //    Di mana:
-    //    - x_i bernilai 1 jika gejala ke-i ada di Kasus Lama, bernilai 0 jika tidak ada.
-    //    - y_i bernilai 1 jika gejala ke-i dipilih oleh User saat ini, bernilai 0 jika tidak dipilih.
-    //    - |x_i - y_i| adalah nilai mutlak selisihnya (jika tidak cocok nilainya 1, jika sama-sama ada/tidak ada nilainya 0).
-    foreach ($gabungan as $g) {
-        $v_kasus = in_array($g, $gejala_kasus) ? 1 : 0;
-        $v_user  = in_array($g, $gejala_user)  ? 1 : 0;
-        $distance += abs($v_kasus - $v_user); // Menambahkan selisih mutlak ke total jarak (Manhattan Distance)
+    // Hitung MANHATTAN DISTANCE (hanya pada ruang dimensi gejala kasus ini):
+    foreach ($gejala_kasus as $g) {
+        // v_kasus pasti 1 karena $g diambil dari $gejala_kasus
+        $v_kasus = 1;
+        $v_user  = in_array($g, $gejala_user) ? 1 : 0;
+        $distance += abs($v_kasus - $v_user); // Menambahkan 1 ke jarak jika user tidak memilih gejala ini
     }
 
-    // 3. Konversi Manhattan Distance ke Nilai Similarity (Kemiripan) dalam bentuk Persentase:
-    //    Rumus Similarity: Similarity = ((Total Seluruh Gejala - Manhattan Distance) / Total Seluruh Gejala) * 100%
-    //    - Semakin kecil nilai Manhattan Distance (jarak perbedaan dikit), maka nilai Similarity akan mendekati 100% (sangat mirip).
-    //    - Semakin besar nilai Manhattan Distance (jarak perbedaan banyak), maka nilai Similarity akan mendekati 0% (tidak mirip).
-    $similarity = $total_fitur > 0
-        ? max(0, (($total_fitur - $distance) / $total_fitur) * 100)
+    // Konversi Manhattan Distance ke Nilai Similarity (Kemiripan) dalam bentuk Persentase:
+    // Pembaginya adalah jumlah gejala pada Kasus Lama ini (bukan total seluruh gejala di sistem).
+    $total_fitur_kasus = count($gejala_kasus);
+    $similarity = $total_fitur_kasus > 0
+        ? max(0, (($total_fitur_kasus - $distance) / $total_fitur_kasus) * 100)
         : 0;
+
 
     // 4. RANKING & SELEKSI KASUS TERBAIK
     //    Simpan hasil perhitungan kemiripan ke dalam array ranking.
