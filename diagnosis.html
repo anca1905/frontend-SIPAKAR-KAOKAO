@@ -233,6 +233,9 @@
             <p>Centang semua gejala yang Anda amati pada tanaman kakao Anda.</p>
 
             <form id="public-diagnosis-form" onsubmit="handlePublicDiagnosis(event)">
+                <div class="input-row" style="margin-bottom: 15px;">
+                    <input type="text" id="symptom-search" placeholder="Cari gejala tanaman Anda (contoh: daun menguning)..." class="input-field" onkeyup="searchSymptoms()" style="width: 100%; flex: 1 1 100%; font-size: 1rem; padding: 14px 18px;">
+                </div>
                 <div class="gejala-grid-public" id="public-gejala-list"></div>
 
                 <div class="input-row">

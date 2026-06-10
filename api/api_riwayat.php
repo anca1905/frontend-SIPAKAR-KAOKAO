@@ -13,7 +13,9 @@ while($row = $result->fetch_assoc()) {
         'nama' => $row['nama_petani'],
         'lokasi' => $row['lokasi'],
         'hasil' => $row['hasil_diagnosis'],
-        'nilai' => $row['nilai_cf']
+        'nilai' => $row['nilai_cf'],
+        'persen' => isset($row['persentase']) ? $row['persentase'] : '-',
+        'gejala' => isset($row['gejala_terpilih']) ? $row['gejala_terpilih'] : '-'
     ];
 }
 

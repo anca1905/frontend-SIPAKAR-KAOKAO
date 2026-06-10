@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db   = "db_kakao";
+$db   = "gea";
 
 $conn = new mysqli($host, $user, $pass, $db);
 

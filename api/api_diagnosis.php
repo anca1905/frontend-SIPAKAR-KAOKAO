@@ -13,30 +13,9 @@ if (empty($gejala_user)) {
     exit;
 }
 
-
-// ===========================================================================
-// SIKLUS UTAMA CASE-BASED REASONING (CBR) - PROSES DIAGNOSIS
-// ===========================================================================
-// Sistem Pakar ini menggunakan metode Case-Based Reasoning (CBR) dengan 4 tahapan utama:
-// 1. RETRIEVE: Mengambil kasus-kasus terdahulu yang mirip dari basis pengetahuan.
-// 2. REUSE: Menggunakan kembali informasi kasus lama untuk menghitung tingkat kemiripan (Similarity)
-//    dengan gejala masukan pengguna menggunakan rumus MANHATTAN DISTANCE.
-// 3. REVISE: Mengevaluasi solusi kasus yang paling mirip (dalam sistem ini ditampilkan ke pengguna).
-// 4. RETAIN: Menyimpan hasil diagnosis baru ke dalam riwayat sebagai basis kasus baru/pengetahuan baru.
-// ===========================================================================
-
 // ---------------------------------------------------------------------------
-// TAHAP CBR: PERSIAPAN & NORMALISASI
+// TAHAP 1: AMBIL DATA KASUS LAMA
 // ---------------------------------------------------------------------------
-// Mengambil total jumlah seluruh gejala yang ada di sistem (basis data).
-// Nilai $total_fitur ini digunakan sebagai penyebut/pembagi dalam normalisasi perhitungan similarity.
-$total_fitur = $conn->query("SELECT COUNT(*) as total FROM gejala")->fetch_assoc()['total'];
-
-// ---------------------------------------------------------------------------
-// TAHAP 1 CBR: RETRIEVE (MENGAMBIL KASUS LAMA)
-// ---------------------------------------------------------------------------
-// Kita mengambil semua basis kasus (kasus penyakit tanaman kakao terdahulu) dari tabel 'kasus' 
-// serta relasi gejalanya ('kasus_gejala') dan solusi penyakitnya.
 $sql_kasus = "SELECT k.kode_kasus, k.nama_kasus, p.kode_penyakit, p.nama_penyakit, p.solusi,
               GROUP_CONCAT(kg.kode_gejala) as gejala_list
               FROM kasus k
@@ -47,7 +26,9 @@ $res_kasus = $conn->query($sql_kasus);
 
 $final_ranking = [];
 
-// Looping untuk memproses dan mencocokkan setiap kasus lama dengan gejala yang diinput user saat ini.
+// ---------------------------------------------------------------------------
+// TAHAP 2: HITUNG MANHATTAN DISTANCE SESUAI SKRIPSI (TABEL 4.11 - 4.15)
+// ---------------------------------------------------------------------------
 while ($row = $res_kasus->fetch_assoc()) {
     $k_kode   = $row['kode_kasus'];
     $nama_k   = $row['nama_kasus'];
@@ -55,46 +36,33 @@ while ($row = $res_kasus->fetch_assoc()) {
     $nama_p   = $row['nama_penyakit'];
     $solusi_p = $row['solusi'];
 
-    // Ambil daftar gejala yang dimiliki oleh Kasus Lama ini
+    // Ambil kelompok gejala khusus untuk kasus lama ini (Misal: G01 s/d G05 saja)
     $gejala_kasus = $row['gejala_list'] ? explode(',', $row['gejala_list']) : [];
 
     if (empty($gejala_kasus)) continue;
 
-    // Cek apakah ada irisan (gejala yang cocok). Jika tidak ada sama sekali, anggap tidak berkaitan dan lewati.
-    $irisan = array_intersect($gejala_kasus, $gejala_user);
-    if (count($irisan) == 0) continue;
+    // Nilai N (Jumlah gejala) adalah jumlah gejala pada masing-masing kasus lama (Sesuai Skripsi)
+    $jumlah_n_kasus = count($gejala_kasus);
 
-    // -----------------------------------------------------------------------
-    // TAHAP 2 CBR: REUSE - PROSES PERHITUNGAN RUMUS KEMIRIPAN (SIMILARITY)
-    // -----------------------------------------------------------------------
-    // Sesuai permintaan: Perhitungan HANYA mengevaluasi gejala yang dimiliki oleh Kasus Lama ini.
-    // Gejala dari penyakit lain yang dipilih user tidak ikut dihitung (tidak menambah penalti jarak).
-    
     $distance = 0;
-    
-    // Hitung MANHATTAN DISTANCE (hanya pada ruang dimensi gejala kasus ini):
+
+    // Looping hanya fokus pada gejala yang ada di kasus lama (Dihitung per blok kasus)
     foreach ($gejala_kasus as $g) {
-        // v_kasus pasti 1 karena $g diambil dari $gejala_kasus
-        $v_kasus = 1;
-        $v_user  = in_array($g, $gejala_user) ? 1 : 0;
-        $distance += abs($v_kasus - $v_user); // Menambahkan 1 ke jarak jika user tidak memilih gejala ini
+        $v_kasus = 1; // Nilainya pasti 1 karena ini adalah gejala milik kasus lama
+        $v_user  = in_array($g, $gejala_user) ? 1 : 0; // Cek apakah user mencentangnya
+
+        // Rumus Manhattan Distance (Selisih mutlak)
+        $distance += abs($v_kasus - $v_user);
     }
 
-    // Konversi Manhattan Distance ke Nilai Similarity (Kemiripan) dalam bentuk Persentase:
-    // Pembaginya adalah jumlah gejala pada Kasus Lama ini (bukan total seluruh gejala di sistem).
-    $total_fitur_kasus = count($gejala_kasus);
-    $similarity = $total_fitur_kasus > 0
-        ? max(0, (($total_fitur_kasus - $distance) / $total_fitur_kasus) * 100)
+    // Konversi ke persentase kemiripan (Similarity)
+    $similarity = $jumlah_n_kasus > 0
+        ? max(0, (($jumlah_n_kasus - $distance) / $jumlah_n_kasus) * 100)
         : 0;
 
-
-    // 4. RANKING & SELEKSI KASUS TERBAIK
-    //    Simpan hasil perhitungan kemiripan ke dalam array ranking.
-    //    Gunakan Manhattan Distance (City Block) sebagai ukuran kemiripan:
-    //    Semakin KECIL nilai distance, semakin MIRIP kasus tersebut.
     if ($similarity > 0) {
-        // Jika kasus dengan penyakit yang sama sudah ada di daftar, simpan hanya yang distance-nya terkecil (paling mirip)
-        if (!isset($final_ranking[$kode_p]) || $distance < $final_ranking[$kode_p]['distance']) {
+        // Jika ada beberapa kasus untuk penyakit yang sama, simpan persentase yang paling besar
+        if (!isset($final_ranking[$kode_p]) || $similarity > $final_ranking[$kode_p]['persen']) {
             $final_ranking[$kode_p] = [
                 'nama'      => $nama_p,
                 'kasus_ref' => $nama_k,
@@ -107,7 +75,7 @@ while ($row = $res_kasus->fetch_assoc()) {
 }
 
 // ---------------------------------------------------------------------------
-// TAHAP 3 CBR: REVISE (EVALUASI HASIL DIAGNOSIS KASUS TERBAIK)
+// TAHAP 3: KESIMPULAN HASIL DIAGNOSIS
 // ---------------------------------------------------------------------------
 if (empty($final_ranking)) {
     echo json_encode([
@@ -118,32 +86,28 @@ if (empty($final_ranking)) {
     exit;
 }
 
-// Urutkan seluruh penyakit dari nilai Manhattan Distance (City Block) terkecil ke terbesar.
-// Nilai distance terkecil = paling mirip dengan gejala user.
+// Urutkan dari persentase kemiripan tertinggi
 uasort($final_ranking, function ($a, $b) {
-    return $a['distance'] <=> $b['distance'];
+    return $b['persen'] <=> $a['persen'];
 });
 
-// Ambil peringkat teratas (penyakit dengan nilai Similarity tertinggi) sebagai hasil akhir diagnosis.
+// Ambil penyakit yang berada di urutan pertama (paling mirip)
 reset($final_ranking);
 $kode_terpilih = key($final_ranking);
 $pemenang      = $final_ranking[$kode_terpilih];
 
 // ---------------------------------------------------------------------------
-// TAHAP 4 CBR: RETAIN (MENYIMPAN KASUS / RIWAYAT BARU)
+// TAHAP 4: SIMPAN KE RIWAYAT (RETAIN)
 // ---------------------------------------------------------------------------
-// Hasil diagnosis baru beserta identitas petani disimpan ke dalam tabel 'riwayat'.
-// Data riwayat ini berfungsi sebagai rekam medis sekaligus dapat di-review oleh admin 
-// untuk dimasukkan kembali sebagai kasus baru di masa mendatang guna memperkaya basis kasus.
 $tgl       = date('Y-m-d');
 $hasil_txt = $pemenang['nama'];
-$nilai_txt = 'Jarak: ' . $pemenang['distance'];
+$nilai_txt = $pemenang['persen'] . '%';
 
 $stmt = $conn->prepare("INSERT INTO riwayat (tanggal, nama_petani, lokasi, hasil_diagnosis, nilai_cf) VALUES (?, ?, ?, ?, ?)");
 $stmt->bind_param("sssss", $tgl, $nama_petani, $lokasi, $hasil_txt, $nilai_txt);
 $stmt->execute();
 
-// Kirimkan response JSON ke Frontend (landing page) untuk ditampilkan ke user
+// Kirim ke Frontend
 echo json_encode([
     'status'             => 'success',
     'penyakit'           => $pemenang['nama'],
@@ -153,4 +117,3 @@ echo json_encode([
     'kasus_referensi'    => $pemenang['kasus_ref'],
     'detail_perhitungan' => array_values($final_ranking)
 ]);
-

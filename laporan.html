@@ -94,11 +94,13 @@
                         <thead>
                             <tr>
                                 <th width="50">No</th>
-                                <th width="120">Tanggal</th>
+                                <th width="100">Tanggal</th>
                                 <th>Nama Petani</th>
                                 <th>Lokasi Kebun</th>
+                                <th>Gejala Terpilih</th>
                                 <th>Hasil Diagnosis</th>
-                                <th width="130">Nilai Kemiripan</th>
+                                <th width="120">Nilai Kemiripan</th>
+                                <th width="100">Persentase</th>
                             </tr>
                         </thead>
                         <tbody id="table-laporan-body"></tbody>
@@ -135,7 +137,7 @@
 
             if (!data || data.length === 0) {
                 tbody.innerHTML = `
-                    <tr><td colspan="6">
+                    <tr><td colspan="8">
                         <div class="empty-state">
                             <i class="fas fa-inbox"></i>
                             <p>Belum ada riwayat diagnosis</p>
@@ -154,8 +156,10 @@
                         <td>${item.tgl}</td>
                         <td>${item.nama}</td>
                         <td>${item.lokasi}</td>
+                        <td><div style="font-size:0.85rem; color:#555; white-space: pre-wrap; text-align: left; max-height: 150px; overflow-y: auto;">${item.gejala}</div></td>
                         <td><b>${item.hasil}</b></td>
                         <td><span class="badge-similarity">${item.nilai}</span></td>
+                        <td><span class="badge-similarity" style="background:#28a745;">${item.persen}</span></td>
                     </tr>`;
             });
         }
@@ -183,9 +187,9 @@
         function cetakLaporan() { window.print(); }
 
         function exportCSV() {
-            const rows = [['No','Tanggal','Nama Petani','Lokasi','Hasil Diagnosis','Nilai Kemiripan']];
+            const rows = [['No','Tanggal','Nama Petani','Lokasi','Gejala Terpilih','Hasil Diagnosis','Nilai Kemiripan','Persentase']];
             riwayatData.forEach((item, i) => {
-                rows.push([i+1, item.tgl, item.nama, item.lokasi, item.hasil, item.nilai]);
+                rows.push([i+1, item.tgl, item.nama, item.lokasi, item.gejala, item.hasil, item.nilai, item.persen]);
             });
             const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
