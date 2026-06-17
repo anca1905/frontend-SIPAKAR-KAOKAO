@@ -103,8 +103,25 @@ $tgl       = date('Y-m-d');
 $hasil_txt = $pemenang['nama'];
 $nilai_txt = $pemenang['persen'] . '%';
 
-$stmt = $conn->prepare("INSERT INTO riwayat (tanggal, nama_petani, lokasi, hasil_diagnosis, nilai_cf) VALUES (?, ?, ?, ?, ?)");
-$stmt->bind_param("sssss", $tgl, $nama_petani, $lokasi, $hasil_txt, $nilai_txt);
+// Ambil kode + nama gejala yang dipilih user dari database, urutkan sesuai kode
+$gejala_names = [];
+if (!empty($gejala_user)) {
+    $placeholders = implode(',', array_fill(0, count($gejala_user), '?'));
+    $types = str_repeat('s', count($gejala_user));
+    $stmt_g = $conn->prepare("SELECT kode_gejala, nama_gejala FROM gejala WHERE kode_gejala IN ($placeholders) ORDER BY kode_gejala ASC");
+    $stmt_g->bind_param($types, ...$gejala_user);
+    $stmt_g->execute();
+    $res_g = $stmt_g->get_result();
+    while ($rg = $res_g->fetch_assoc()) {
+        $gejala_names[] = '[' . $rg['kode_gejala'] . '] ' . $rg['nama_gejala'];
+    }
+    $stmt_g->close();
+}
+$gejala_txt = !empty($gejala_names) ? implode("\n", $gejala_names) : implode(', ', $gejala_user);
+$persen_txt = $pemenang['persen'] . '%';
+
+$stmt = $conn->prepare("INSERT INTO riwayat (tanggal, nama_petani, lokasi, gejala_terpilih, hasil_diagnosis, nilai_cf, persentase) VALUES (?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("sssssss", $tgl, $nama_petani, $lokasi, $gejala_txt, $hasil_txt, $nilai_txt, $persen_txt);
 $stmt->execute();
 
 // Kirim ke Frontend

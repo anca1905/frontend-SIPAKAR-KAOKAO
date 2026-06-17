@@ -41,7 +41,7 @@
                 <li><a href="kelola_gejala.html"><i class="fas fa-viruses"></i> Kelola Gejala</a></li>
                 <li><a href="kelola_penyakit.html"><i class="fas fa-bacteria"></i> Kelola Penyakit</a></li>
                 <li><a href="kelola_hama.html"><i class="fas fa-bug"></i> Kelola Hama</a></li>
-                <li><a href="kelola_relasi.html"><i class="fas fa-link"></i> Kelola Relasi<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gejala - Penyakit</a></li>
+
                 <li><a href="kelola_kasus.html"><i class="fas fa-database"></i> Kelola Data Kasus</a></li>
                 <li><a href="kelola_artikel.html"><i class="fas fa-newspaper"></i> Kelola Artikel</a></li>
                 <li><a href="pengguna.html"><i class="fas fa-users"></i> Data Pengguna</a></li>
@@ -130,6 +130,20 @@
             renderTable(riwayatData);
         }
 
+        // Format teks gejala: [G01] nama → kode hijau bold + nama per baris
+        function formatGejala(text) {
+            if (!text || text === '-') return '<span style="color:#ccc;">-</span>';
+            return text.split('\n').map(line => {
+                // Match pola [Gxx] atau [Hxx]
+                return line.replace(/^\[([A-Z]\d+)\]\s*(.*)$/, (_, kode, nama) =>
+                    `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:3px;">
+                        <span style="background:#e8f5e9;color:#1B5E20;font-weight:700;font-size:0.78rem;padding:1px 7px;border-radius:5px;white-space:nowrap;flex-shrink:0;">${kode}</span>
+                        <span>${nama}</span>
+                    </div>`
+                ) || `<div style="margin-bottom:3px;">${line}</div>`;
+            }).join('');
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('table-laporan-body');
             const info  = document.getElementById('info-bar');
@@ -156,7 +170,7 @@
                         <td>${item.tgl}</td>
                         <td>${item.nama}</td>
                         <td>${item.lokasi}</td>
-                        <td><div style="font-size:0.85rem; color:#555; white-space: pre-wrap; text-align: left; max-height: 150px; overflow-y: auto;">${item.gejala}</div></td>
+                        <td><div style="font-size:0.85rem; color:#555; text-align: left; max-height: 150px; overflow-y: auto;">${formatGejala(item.gejala)}</div></td>
                         <td><b>${item.hasil}</b></td>
                         <td><span class="badge-similarity">${item.nilai}</span></td>
                         <td><span class="badge-similarity" style="background:#28a745;">${item.persen}</span></td>
