@@ -101,7 +101,7 @@ $pemenang      = $final_ranking[$kode_terpilih];
 // ---------------------------------------------------------------------------
 $tgl       = date('Y-m-d');
 $hasil_txt = $pemenang['nama'];
-$nilai_txt = $pemenang['persen'] . '%';
+$nilai_txt = $pemenang['distance'];  // Jarak City Block (Manhattan Distance)
 
 // Ambil kode + nama gejala yang dipilih user dari database, urutkan sesuai kode
 $gejala_names = [];

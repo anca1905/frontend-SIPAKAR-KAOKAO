@@ -99,7 +99,7 @@
                                 <th>Lokasi Kebun</th>
                                 <th>Gejala Terpilih</th>
                                 <th>Hasil Diagnosis</th>
-                                <th width="120">Nilai Kemiripan</th>
+                                <th width="120">Jarak</th>
                                 <th width="100">Persentase</th>
                             </tr>
                         </thead>
@@ -172,7 +172,7 @@
                         <td>${item.lokasi}</td>
                         <td><div style="font-size:0.85rem; color:#555; text-align: left; max-height: 150px; overflow-y: auto;">${formatGejala(item.gejala)}</div></td>
                         <td><b>${item.hasil}</b></td>
-                        <td><span class="badge-similarity">${item.nilai}</span></td>
+                        <td style="text-align:center;"><b>${item.nilai}</b></td>
                         <td><span class="badge-similarity" style="background:#28a745;">${item.persen}</span></td>
                     </tr>`;
             });
