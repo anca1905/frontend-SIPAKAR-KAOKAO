@@ -45,14 +45,24 @@ while ($row = $res_kasus->fetch_assoc()) {
     $jumlah_n_kasus = count($gejala_kasus);
 
     $distance = 0;
+    $jumlah_cocok = 0;
 
     // Looping hanya fokus pada gejala yang ada di kasus lama (Dihitung per blok kasus)
     foreach ($gejala_kasus as $g) {
         $v_kasus = 1; // Nilainya pasti 1 karena ini adalah gejala milik kasus lama
         $v_user  = in_array($g, $gejala_user) ? 1 : 0; // Cek apakah user mencentangnya
 
+        if ($v_user == 1) {
+            $jumlah_cocok++;
+        }
+
         // Rumus Manhattan Distance (Selisih mutlak)
         $distance += abs($v_kasus - $v_user);
+    }
+
+    // Syarat minimal 2 gejala yang cocok dalam 1 penyakit/kasus
+    if ($jumlah_cocok < 2) {
+        continue;
     }
 
     // Konversi ke persentase kemiripan (Similarity)

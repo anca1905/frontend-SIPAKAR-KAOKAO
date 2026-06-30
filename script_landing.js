@@ -185,8 +185,8 @@ async function loadRiwayatPublic() {
 async function handlePublicDiagnosis(e) {
     e.preventDefault();
 
-    if (selectedGejalaCodes.length === 0) {
-        showNotification('Gejala Belum Dipilih', "Silahkan pilih minimal satu gejala tanaman kakao Anda!", 'warning');
+    if (selectedGejalaCodes.length < 2) {
+        showNotification('Gejala Tidak Cukup', "Silahkan pilih minimal 2 gejala tanaman kakao Anda!", 'warning');
         return;
     }
 
