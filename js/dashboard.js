@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem('adminToken')) {
-        window.location.href = 'auth.html';
+        window.location.href = '../auth.html';
         return;
     }
 
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function logout() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminNama');
-    window.location.href = 'auth.html';
+    window.location.href = '../auth.html';
 }
 
 function viewAdmin(el, sectionId) {
@@ -58,7 +58,7 @@ function generatePenyakitCode() {
 // ======================== DASHBOARD STATS ======================== //
 async function loadDashboardStats() {
     try {
-        const resp = await fetch('api/api_dashboard.php');
+        const resp = await fetch('../api/api_dashboard.php');
         const data = await resp.json();
         document.getElementById('total-gejala').innerText   = data.total_gejala;
         document.getElementById('total-penyakit').innerText = data.total_penyakit;
@@ -69,7 +69,7 @@ async function loadDashboardStats() {
 
 // ======================== GEJALA ======================== //
 async function loadGejalaFromDB() {
-    const resp = await fetch('api/api_gejala.php?action=read');
+    const resp = await fetch('../api/api_gejala.php?action=read');
     dataGejala = await resp.json();
     const tbody = document.getElementById('table-gejala-body');
     tbody.innerHTML = '';
@@ -102,7 +102,7 @@ async function saveGejala(e) {
     formData.append('nama', document.getElementById('input-nama-gejala').value);
     formData.append('mode', idLama === '' ? 'tambah' : 'edit');
 
-    const resp = await fetch('api/api_gejala.php?action=save', { method: 'POST', body: formData });
+    const resp = await fetch('../api/api_gejala.php?action=save', { method: 'POST', body: formData });
     const result = await resp.json();
     if (result.status === 'success') {
         closeModal('gejala');
@@ -123,14 +123,14 @@ async function hapusGejala(kode) {
     if (confirm('Hapus gejala ini?')) {
         const formData = new FormData();
         formData.append('kode', kode);
-        await fetch('api/api_gejala.php?action=delete', { method: 'POST', body: formData });
+        await fetch('../api/api_gejala.php?action=delete', { method: 'POST', body: formData });
         loadGejalaFromDB();
     }
 }
 
 // ======================== PENYAKIT ======================== //
 async function loadPenyakitFromDB() {
-    const resp = await fetch('api/api_penyakit.php?action=read');
+    const resp = await fetch('../api/api_penyakit.php?action=read');
     dataPenyakit = await resp.json();
     const tbody = document.getElementById('table-penyakit-body');
     tbody.innerHTML = '';
@@ -175,7 +175,7 @@ async function savePenyakit(e) {
     formData.append('solusi', document.getElementById('input-solusi-penyakit').value);
     formData.append('mode', document.getElementById('penyakit-id-lama').value === '' ? 'tambah' : 'edit');
 
-    const resp = await fetch('api/api_penyakit.php?action=save', { method: 'POST', body: formData });
+    const resp = await fetch('../api/api_penyakit.php?action=save', { method: 'POST', body: formData });
     const result = await resp.json();
     if (result.status === 'success') {
         closeModal('penyakit');
@@ -188,14 +188,14 @@ async function hapusPenyakit(kode) {
     if (confirm('Hapus penyakit ini? Data Kasus yang terkait mungkin ikut terhapus!')) {
         const formData = new FormData();
         formData.append('kode', kode);
-        await fetch('api/api_penyakit.php?action=delete', { method: 'POST', body: formData });
+        await fetch('../api/api_penyakit.php?action=delete', { method: 'POST', body: formData });
         loadPenyakitFromDB();
     }
 }
 
 // ======================== DATA KASUS (PENGGANTI ATURAN) ======================== //
 async function loadKasusFromDB() {
-    const resp = await fetch('api/api_kasus.php?action=read');
+    const resp = await fetch('../api/api_kasus.php?action=read');
     dataKasusBase = await resp.json();
     const tbody = document.getElementById('table-kasus-body');
     tbody.innerHTML = '';
@@ -231,13 +231,13 @@ async function loadKasusFromDB() {
 }
 
 async function populateKasusSelectOptions() {
-    const respP = await fetch('api/api_penyakit.php?action=read');
+    const respP = await fetch('../api/api_penyakit.php?action=read');
     const dP = await respP.json();
     document.getElementById('input-kasus-penyakit').innerHTML = dP.map(x => `<option value="${x.kode}">[${x.kode}] ${x.nama}</option>`).join('');
 }
 
 async function populateCheckboxGejala() {
-    const resp = await fetch('api/api_gejala.php?action=read');
+    const resp = await fetch('../api/api_gejala.php?action=read');
     const data = await resp.json();
     const container = document.getElementById('checkbox-gejala-container');
     container.innerHTML = '';
@@ -315,7 +315,7 @@ async function saveKasus(e) {
 
     formData.append('gejala', JSON.stringify(selectedGejala));
 
-    const resp = await fetch('api/api_kasus.php?action=save', { method: 'POST', body: formData });
+    const resp = await fetch('../api/api_kasus.php?action=save', { method: 'POST', body: formData });
     const result = await resp.json();
     if (result.status === 'success') {
         closeModal('kasus');
@@ -328,14 +328,14 @@ async function hapusKasus(kode) {
     if (confirm('Hapus kasus ini?')) {
         const formData = new FormData();
         formData.append('kode_kasus', kode);
-        await fetch('api/api_kasus.php?action=delete', { method: 'POST', body: formData });
+        await fetch('../api/api_kasus.php?action=delete', { method: 'POST', body: formData });
         loadKasusFromDB();
     }
 }
 
 // ======================== LAPORAN ======================== //
 async function loadLaporanFromDB() {
-    const resp = await fetch('api/api_riwayat.php');
+    const resp = await fetch('../api/api_riwayat.php');
     riwayatData = await resp.json();
     renderLaporanTable(riwayatData);
 }

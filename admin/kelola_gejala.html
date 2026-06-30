@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Gejala - Admin CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -80,20 +80,20 @@
 
     <script>
         (function() {
-            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
             document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
         })();
 
         function doLogout() {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminNama');
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
 
         let dataGejala = [];
 
         async function loadGejala() {
-            const resp = await fetch('api/api_gejala.php?action=read');
+            const resp = await fetch('../api/api_gejala.php?action=read');
             dataGejala = await resp.json();
             const tbody = document.getElementById('table-gejala-body');
             tbody.innerHTML = '';
@@ -149,7 +149,7 @@
             fd.append('kode', document.getElementById('input-kode-gejala').value);
             fd.append('nama', document.getElementById('input-nama-gejala').value);
             fd.append('mode', mode);
-            const resp = await fetch('api/api_gejala.php?action=save', { method: 'POST', body: fd });
+            const resp = await fetch('../api/api_gejala.php?action=save', { method: 'POST', body: fd });
             const res  = await resp.json();
             if (res.status === 'success') { closeModal(); loadGejala(); showToast(res.message, 'success'); }
             else showToast(res.message, 'error');
@@ -159,7 +159,7 @@
             if (!confirm('Hapus gejala ' + kode + '?')) return;
             const fd = new FormData();
             fd.append('kode', kode);
-            await fetch('api/api_gejala.php?action=delete', { method: 'POST', body: fd });
+            await fetch('../api/api_gejala.php?action=delete', { method: 'POST', body: fd });
             loadGejala();
             showToast('Gejala berhasil dihapus', 'success');
         }

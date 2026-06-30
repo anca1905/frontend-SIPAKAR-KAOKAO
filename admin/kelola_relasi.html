@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Relasi Gejala - Penyakit | Sistem CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <style>
@@ -266,7 +266,7 @@
     <script>
         // ========== AUTH ==========
         if (!localStorage.getItem('adminToken')) {
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
         document.getElementById('admin-name').textContent =
             localStorage.getItem('adminNama') || 'Admin';
@@ -274,7 +274,7 @@
         function doLogout() {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminNama');
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
 
         function goMenu(el, section) {
@@ -296,8 +296,8 @@
 
         async function loadDropdowns() {
             const [rG, rP] = await Promise.all([
-                fetch('api/api_gejala.php?action=read'),
-                fetch('api/api_penyakit.php?action=read')
+                fetch('../api/api_gejala.php?action=read'),
+                fetch('../api/api_penyakit.php?action=read')
             ]);
             listGejala = await rG.json();
             listPenyakit = await rP.json();
@@ -316,7 +316,7 @@
         }
 
         async function loadRelasi() {
-            const resp = await fetch('api/api_relasi.php?action=read');
+            const resp = await fetch('../api/api_relasi.php?action=read');
             const data = await resp.json();
 
             if (dtTable) { dtTable.clear().destroy(); }
@@ -406,7 +406,7 @@
 
                 console.log("Sending data:", Object.fromEntries(fd));
 
-                const resp   = await fetch('api/api_relasi.php?action=save', { method: 'POST', body: fd });
+                const resp   = await fetch('../api/api_relasi.php?action=save', { method: 'POST', body: fd });
                 const text = await resp.text();
                 console.log("Server response:", text);
                 
@@ -438,7 +438,7 @@
             if (!confirm('Hapus relasi ini? Tindakan tidak dapat dibatalkan.')) return;
             const fd = new FormData();
             fd.append('id', id);
-            const resp   = await fetch('api/api_relasi.php?action=delete', { method: 'POST', body: fd });
+            const resp   = await fetch('../api/api_relasi.php?action=delete', { method: 'POST', body: fd });
             const result = await resp.json();
             if (result.status === 'success') {
                 showToast('Relasi berhasil dihapus.', 'success');

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Data Kasus - Admin CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .badge-gejala {
@@ -118,20 +118,20 @@
 
     <script>
         (function() {
-            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
             document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
         })();
 
         function doLogout() {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminNama');
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
 
         let dataKasus = [];
 
         async function loadKasus() {
-            const resp = await fetch('api/api_kasus.php?action=read');
+            const resp = await fetch('../api/api_kasus.php?action=read');
             dataKasus = await resp.json();
             const tbody = document.getElementById('table-kasus-body');
             tbody.innerHTML = '';
@@ -161,14 +161,14 @@
         }
 
         async function populatePenyakitSelect(selectedKode = '') {
-            const resp = await fetch('api/api_penyakit.php?action=read');
+            const resp = await fetch('../api/api_penyakit.php?action=read');
             const data = await resp.json();
             const sel = document.getElementById('input-kasus-penyakit');
             sel.innerHTML = data.map(x => `<option value="${x.kode}" ${x.kode === selectedKode ? 'selected' : ''}>[${x.kode}] ${x.nama}</option>`).join('');
         }
 
         async function populateCheckboxGejala(checkedList = []) {
-            const resp = await fetch('api/api_gejala.php?action=read');
+            const resp = await fetch('../api/api_gejala.php?action=read');
             const data = await resp.json();
             const container = document.getElementById('checkbox-gejala-container');
             container.innerHTML = '';
@@ -221,7 +221,7 @@
             fd.append('nama_kasus', document.getElementById('input-kasus-nama').value);
             fd.append('penyakit',   document.getElementById('input-kasus-penyakit').value);
             fd.append('gejala',     JSON.stringify(selectedGejala));
-            const resp = await fetch('api/api_kasus.php?action=save', { method: 'POST', body: fd });
+            const resp = await fetch('../api/api_kasus.php?action=save', { method: 'POST', body: fd });
             const res  = await resp.json();
             if (res.status === 'success') { closeModal(); loadKasus(); showToast(res.message, 'success'); }
             else showToast(res.message, 'error');
@@ -231,7 +231,7 @@
             if (!confirm('Hapus kasus ' + kode + '? Tindakan ini tidak dapat dibatalkan.')) return;
             const fd = new FormData();
             fd.append('kode_kasus', kode);
-            await fetch('api/api_kasus.php?action=delete', { method: 'POST', body: fd });
+            await fetch('../api/api_kasus.php?action=delete', { method: 'POST', body: fd });
             loadKasus();
             showToast('Kasus berhasil dihapus', 'success');
         }

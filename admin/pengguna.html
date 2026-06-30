@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pengguna - Admin CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* ── Stat mini cards ── */
@@ -195,14 +195,14 @@
 <script>
     // ── Auth ──
     (function() {
-        if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+        if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
         document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
     })();
 
     function doLogout() {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminNama');
-        window.location.href = 'auth.html';
+        window.location.href = '../auth.html';
     }
 
     // ── Data ──
@@ -211,7 +211,7 @@
 
     // ── Load stats ──
     async function loadStats() {
-        const r = await fetch('api/api_pengguna.php?action=stats');
+        const r = await fetch('../api/api_pengguna.php?action=stats');
         const d = await r.json();
         document.getElementById('stat-pengguna').innerText  = d.total_pengguna;
         document.getElementById('stat-diagnosis').innerText = d.total_diagnosis;
@@ -220,7 +220,7 @@
 
     // ── Load daftar pengguna ──
     async function loadPengguna() {
-        const resp = await fetch('api/api_pengguna.php?action=list');
+        const resp = await fetch('../api/api_pengguna.php?action=list');
         dataPengguna = await resp.json();
         renderTable(dataPengguna);
     }
@@ -284,7 +284,7 @@
     }
 
     async function loadDetail(nama) {
-        const resp = await fetch('api/api_pengguna.php?action=detail&nama=' + encodeURIComponent(nama));
+        const resp = await fetch('../api/api_pengguna.php?action=detail&nama=' + encodeURIComponent(nama));
         const data = await resp.json();
         const tbody = document.getElementById('detail-tbody');
         tbody.innerHTML = '';
@@ -316,7 +316,7 @@
         if (!confirm('Hapus riwayat diagnosis ini?')) return;
         const fd = new FormData();
         fd.append('id', id);
-        const resp = await fetch('api/api_pengguna.php?action=delete', { method:'POST', body:fd });
+        const resp = await fetch('../api/api_pengguna.php?action=delete', { method:'POST', body:fd });
         const res  = await resp.json();
         if (res.status === 'success') {
             showToast('Riwayat dihapus', 'success');

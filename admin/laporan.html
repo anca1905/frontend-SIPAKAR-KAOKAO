@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Diagnosis - Admin CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .filter-bar {
@@ -112,20 +112,20 @@
 
     <script>
         (function() {
-            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
             document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
         })();
 
         function doLogout() {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminNama');
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
 
         let riwayatData = [];
 
         async function loadLaporan() {
-            const resp = await fetch('api/api_riwayat.php');
+            const resp = await fetch('../api/api_riwayat.php');
             riwayatData = await resp.json();
             renderTable(riwayatData);
         }

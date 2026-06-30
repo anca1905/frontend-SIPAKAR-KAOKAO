@@ -44,7 +44,7 @@ async function handleLogin(e) {
                     timerProgressBar: true,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = 'dashboard.html';
+                    window.location.href = 'admin/dashboard.html';
                 });
             } else {
                 Swal.fire({

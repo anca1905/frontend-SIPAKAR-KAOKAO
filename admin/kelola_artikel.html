@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Artikel – Admin SIPAKAR KAKAO</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         /* ── Tab bar ── */
@@ -251,13 +251,13 @@
 <script>
 /* ── Auth guard ─────────────────────────────── */
 (function() {
-    if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+    if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
     document.getElementById('admin-name').innerText = localStorage.getItem('adminNama') || 'Admin';
 })();
 function doLogout() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminNama');
-    window.location.href = 'auth.html';
+    window.location.href = '../auth.html';
 }
 
 /* ── Tab switching ──────────────────────────── */
@@ -278,7 +278,7 @@ function toast(msg, type = 'success') {
 let allKat = [];
 
 async function loadKategori() {
-    const r  = await fetch('api/api_artikel.php?action=read_kategori');
+    const r  = await fetch('../api/api_artikel.php?action=read_kategori');
     allKat   = await r.json();
     // Populate select in artikel modal
     const sel = document.getElementById('art-kategori');
@@ -324,7 +324,7 @@ async function saveKategori(e) {
     fd.append('id',    document.getElementById('kat-id').value);
     fd.append('nama',  document.getElementById('kat-nama').value);
     fd.append('warna', document.querySelector('input[name="kat-warna"]:checked').value);
-    const r   = await fetch('api/api_artikel.php?action=save_kategori', { method:'POST', body:fd });
+    const r   = await fetch('../api/api_artikel.php?action=save_kategori', { method:'POST', body:fd });
     const res = await r.json();
     if (res.status === 'success') { closeKatModal(); loadKategori(); toast(res.message); }
     else toast(res.message, 'error');
@@ -334,7 +334,7 @@ async function hapusKat(id, nama) {
     const c = await Swal.fire({ title:`Hapus Kategori "${nama}"?`, text:'Artikel dengan kategori ini akan kehilangan kategorinya.', icon:'warning', showCancelButton:true, confirmButtonColor:'#dc3545', cancelButtonText:'Batal', confirmButtonText:'Ya, Hapus' });
     if (!c.isConfirmed) return;
     const fd = new FormData(); fd.append('id', id);
-    const r  = await fetch('api/api_artikel.php?action=delete_kategori', { method:'POST', body:fd });
+    const r  = await fetch('../api/api_artikel.php?action=delete_kategori', { method:'POST', body:fd });
     const res = await r.json();
     if (res.status === 'success') { loadKategori(); toast(res.message); }
     else toast(res.message, 'error');
@@ -342,7 +342,7 @@ async function hapusKat(id, nama) {
 
 /* ── Artikel ─────────────────────────────────── */
 async function loadArtikel() {
-    const r   = await fetch('api/api_artikel.php?action=read_artikel&all=1');
+    const r   = await fetch('../api/api_artikel.php?action=read_artikel&all=1');
     const data = await r.json();
     const tbody = document.getElementById('tbody-artikel');
     if (!data.length) {
@@ -416,7 +416,7 @@ async function saveArtikel(e) {
     fd.append('protokol',    document.getElementById('art-protokol').value);
     fd.append('status',      document.getElementById('art-status').value);
 
-    const r   = await fetch('api/api_artikel.php?action=save_artikel', { method:'POST', body:fd });
+    const r   = await fetch('../api/api_artikel.php?action=save_artikel', { method:'POST', body:fd });
     const res = await r.json();
     if (res.status === 'success') { closeArtikelModal(); loadArtikel(); toast(res.message); }
     else toast(res.message, 'error');
@@ -426,7 +426,7 @@ async function hapusArtikel(id, judul) {
     const c = await Swal.fire({ title:`Hapus artikel?`, html:`<b>${judul}</b><br><small>Tindakan ini tidak dapat dibatalkan.</small>`, icon:'warning', showCancelButton:true, confirmButtonColor:'#dc3545', cancelButtonText:'Batal', confirmButtonText:'Ya, Hapus' });
     if (!c.isConfirmed) return;
     const fd = new FormData(); fd.append('id', id);
-    const r  = await fetch('api/api_artikel.php?action=delete_artikel', { method:'POST', body:fd });
+    const r  = await fetch('../api/api_artikel.php?action=delete_artikel', { method:'POST', body:fd });
     const res = await r.json();
     if (res.status === 'success') { loadArtikel(); toast(res.message); }
     else toast(res.message, 'error');

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Sistem CBR Kakao</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .stat-link-card {
@@ -109,7 +109,7 @@
 
     <script>
         (function() {
-            if (!localStorage.getItem('adminToken')) { window.location.href = 'auth.html'; return; }
+            if (!localStorage.getItem('adminToken')) { window.location.href = '../auth.html'; return; }
             const nama = localStorage.getItem('adminNama') || 'Admin';
             document.getElementById('admin-name').innerText = nama;
             document.getElementById('admin-name-greet').innerText = nama;
@@ -118,12 +118,12 @@
         function doLogout() {
             localStorage.removeItem('adminToken');
             localStorage.removeItem('adminNama');
-            window.location.href = 'auth.html';
+            window.location.href = '../auth.html';
         }
 
         async function loadStats() {
             try {
-                const r = await fetch('api/api_dashboard.php');
+                const r = await fetch('../api/api_dashboard.php');
                 const d = await r.json();
                 document.getElementById('total-gejala').innerText   = d.total_gejala;
                 document.getElementById('total-penyakit').innerText = d.total_penyakit;
